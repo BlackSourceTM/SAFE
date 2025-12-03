@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E2Ebox SAFE – رمزنگاری سرتاسری فایل‌ها</title>
+  <meta name="description" content="E2Ebox SAFE – رمزنگاری و رمزگشایی امن فایل‌ها فقط روی دستگاه کاربر، بدون ذخیره فایل خام روی سرور." />
+
+  <!-- بعداً اگر لازم شد می‌تونی فونت دلخواه اضافه کنی -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header__brand">
+        <div class="logo-circle">S</div>
+        <div class="header__titles">
+          <h1 class="header__title">SAFE – E2Ebox</h1>
+          <p className="header__subtitle">نسل جدید رمزنگاری سرتاسری فایل‌ها</p>
+        </div>
+      </div>
+      <div class="header__actions">
+        <button id="themeToggle" class="btn btn--ghost" type="button">
+          حالت تیره / روشن
+        </button>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- بخش معرفی -->
+      <section class="hero">
+        <h2 class="hero__title">رمزنگاری روی دستگاه خودت، بدون اعتماد به سرور</h2>
+        <p class="hero__text">
+          این نسخه‌ی اولیه‌ی رابط وب SAFE است. در نسخه‌های بعدی، این صفحه
+          به‌صورت WebApp به ربات تلگرام متصل می‌شود و تمام عملیات
+          <strong>Encrypt / Decrypt</strong> فقط روی دستگاه شما انجام خواهد شد.
+        </p>
+
+        <div class="hero__hint">
+          <p>
+            ⚠️ فعلاً هیچ عملیات واقعی روی فایل انجام نمی‌شود.
+            این فقط اسکلت اولیه برای استقرار روی GitHub Pages است.
+          </p>
+        </div>
+      </section>
+
+      <!-- کارت‌های عملیات -->
+      <section class="actions">
+        <div class="card">
+          <h3 class="card__title">Encrypt فایل</h3>
+          <p class="card__text">
+            در نسخه‌ی نهایی، اینجا می‌توانید فایل خود را انتخاب کرده و با
+            استفاده از Web Crypto API آن را به فرمت <code>.SAFE</code> رمزنگاری کنید.
+          </p>
+          <button class="btn btn--primary" id="encryptBtn" type="button">
+            شروع رمزنگاری (به‌زودی)
+          </button>
+        </div>
+
+        <div class="card">
+          <h3 class="card__title">Decrypt فایل SAFE</h3>
+          <p class="card__text">
+            در نسخه‌ی نهایی، اینجا می‌توانید فایل <code>.SAFE</code> را انتخاب و
+            فایل اصلی را بازیابی کنید؛ بدون ارسال فایل به سرور.
+          </p>
+          <button class="btn btn--outline" id="decryptBtn" type="button">
+            شروع رمزگشایی (به‌زودی)
+          </button>
+        </div>
+      </section>
+
+      <!-- محل انتخاب فایل (فعلاً نمایشی) -->
+      <section class="file-section">
+        <h3 class="file-section__title">پنل فایل (دمو)</h3>
+        <p class="file-section__text">
+          در آینده، این بخش محل انتخاب، کشیدن و رها کردن (Drag & Drop) فایل‌ها،
+          نمایش وضعیت پردازش و نوار پیشرفت خواهد بود.
+        </p>
+
+        <div class="dropzone" id="dropzone">
+          <p class="dropzone__icon">📁</p>
+          <p class="dropzone__text">
+            فعلاً این بخش نمایشی است.<br />
+            بعداً می‌توانید فایل‌ها را اینجا بکشید و رها کنید.
+          </p>
+        </div>
+      </section>
+
+      <!-- وضعیت و پیام‌ها -->
+      <section class="status" id="statusSection">
+        <h3 class="status__title">وضعیت سیستم</h3>
+        <ul class="status__list" id="statusList">
+          <li>🟢 رابط وب ایستا (GitHub Pages) آماده است.</li>
+          <li>🟡 اتصال به ربات تلگرام و Cloudflare Worker در مراحل بعدی انجام می‌شود.</li>
+          <li>🔴 هنوز هیچ فایل واقعی پردازش نمی‌شود.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p class="footer__text">
+        ساخته‌شده برای پروژه SAFE – E2Ebox
+      </p>
+      <p class="footer__text footer__text--muted">
+        این فقط نسخه‌ی اولیه‌ی Front است. لطفاً برای اطلاعات بیشتر به ربات تلگرام مراجعه کنید.
+      </p>
+    </footer>
+  </div>
+
+  <!-- در آینده: اسکریپت Telegram WebApp و logic اصلی اینجا اضافه می‌شود -->
+  <!-- <script src="https://telegram.org/js/telegram-web-app.js"></script> -->
+
+  <script src="script.js"></script>
+</body>
+</html>
