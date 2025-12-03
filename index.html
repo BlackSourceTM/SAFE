@@ -16,15 +16,18 @@
       <div class="header__brand">
         <div class="logo-circle">S</div>
         <div class="header__titles">
-          <h1 class="header__title">SAFE – E2Ebox</h1>
-          <p class="header__subtitle">
+          <h1 class="header__title" data-i18n="title">SAFE – E2Ebox</h1>
+          <p class="header__subtitle" data-i18n="subtitle">
             رمزنگاری سرتاسری فایل‌ها فقط روی دستگاه شما
           </p>
         </div>
       </div>
       <div class="header__actions">
-        <button id="themeToggle" class="btn btn--ghost" type="button">
-          حالت تیره / روشن
+        <button id="langToggle" class="btn btn--ghost btn--icon" type="button">
+          <span id="langToggleLabel">FA</span>/<span>EN</span>
+        </button>
+        <button id="themeToggle" class="btn btn--ghost btn--icon" type="button">
+          <span id="themeIcon">🌙</span>
         </button>
       </div>
     </header>
@@ -32,14 +35,14 @@
     <main class="main">
       <!-- معرفی کوتاه -->
       <section class="hero">
-        <h2 class="hero__title">نسخه‌ی اولیه Mini App SAFE</h2>
-        <p class="hero__text">
+        <h2 class="hero__title" data-i18n="hero_title">نسخه‌ی اولیه Mini App SAFE</h2>
+        <p class="hero__text" data-i18n="hero_text">
           در این نسخه می‌توانید فایل‌های خود را به صورت محلی (بدون ارسال به
           سرور) با استفاده از Web Crypto API رمزنگاری و رمزگشایی کنید.
           فرمت خروجی <code>.SAFE</code> است.
         </p>
         <div class="hero__hint">
-          <p>
+          <p data-i18n="hero_hint">
             ⚠️ این نسخه هنوز به ربات تلگرام و Cloudflare Worker متصل نشده است.
             همه چیز فقط روی دستگاه شما انجام می‌شود.
           </p>
@@ -53,6 +56,7 @@
           data-mode="encrypt"
           type="button"
           id="modeEncryptBtn"
+          data-i18n="mode_encrypt"
         >
           🔐 رمزنگاری (Encrypt)
         </button>
@@ -61,6 +65,7 @@
           data-mode="decrypt"
           type="button"
           id="modeDecryptBtn"
+          data-i18n="mode_decrypt"
         >
           🔓 رمزگشایی (Decrypt)
         </button>
@@ -68,67 +73,77 @@
 
       <!-- پنل اصلی عملیات -->
       <section class="panel">
+        <!-- ستون فایل -->
         <div class="panel__column">
-          <h3 class="panel__title">۱. انتخاب فایل</h3>
-          <p class="panel__text">
+          <h3 class="panel__title" data-i18n="step1_title">۱. انتخاب فایل</h3>
+          <p class="panel__text" data-i18n="step1_text">
             می‌توانید فایل را از حافظه دستگاه انتخاب کنید یا روی باکس زیر
             دراپ کنید.
           </p>
 
-          <label for="fileInput" class="file-input-label">
+          <label for="fileInput" class="file-input-label" data-i18n="choose_file">
             انتخاب فایل
           </label>
           <input type="file" id="fileInput" class="file-input" />
 
           <div id="dropzone" class="dropzone">
             <p class="dropzone__icon">📁</p>
-            <p class="dropzone__text">
+            <p class="dropzone__text" data-i18n="drop_here">
               فایل خود را اینجا بکشید و رها کنید
             </p>
-            <p class="dropzone__filename" id="selectedFileName">
+            <p class="dropzone__filename" id="selectedFileName" data-i18n="no_file">
               فایلی انتخاب نشده است.
             </p>
           </div>
 
-          <p class="panel__hint">
+          <p class="panel__hint" data-i18n="size_hint">
             محدودیت پیشنهادی فعلی: حداکثر ۵۰۰ مگابایت. برای فایل‌های خیلی
             بزرگ، در نسخه‌های بعدی از استریم و چانک استفاده می‌کنیم.
           </p>
         </div>
 
+        <!-- ستون رمز + کپچا -->
         <div class="panel__column">
-          <h3 class="panel__title">۲. رمز عبور</h3>
-          <p class="panel__text">
+          <h3 class="panel__title" data-i18n="step2_title">۲. تنظیم رمز عبور و کپچا</h3>
+          <p class="panel__text" data-i18n="step2_text">
             یک رمز عبور قوی انتخاب کنید. این رمز روی سرور ذخیره نمی‌شود و
             فقط برای مشتق‌سازی کلید در دستگاه شما استفاده می‌شود.
           </p>
 
+          <!-- مرحله ۱: وارد کردن رمز اصلی -->
           <div class="field">
-            <label for="passwordInput" class="field__label">
+            <label for="passwordInput" class="field__label" data-i18n="password_label">
               رمز عبور
             </label>
-            <input
-              type="password"
-              id="passwordInput"
-              class="field__input"
-              placeholder="مثلاً: My$uperStr0ngP@ssw0rd"
-              autocomplete="new-password"
-            />
+            <div class="field__input-wrapper">
+              <input
+                type="password"
+                id="passwordInput"
+                class="field__input"
+                placeholder="مثلاً: My$uperStr0ngP@ssw0rd"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="field__icon-btn"
+                id="passwordToggleBtn"
+                aria-label="نمایش موقت رمز"
+              >
+                👁
+              </button>
+            </div>
           </div>
 
-          <div class="field field--inline">
-            <label class="field__label field__label--inline">
-              تکرار رمز عبور
-            </label>
-            <input
-              type="password"
-              id="passwordConfirmInput"
-              class="field__input"
-              placeholder="تکرار رمز برای اطمینان"
-              autocomplete="new-password"
-            />
-          </div>
+          <button
+            type="button"
+            class="btn btn--outline field__step-btn"
+            id="passwordNextBtn"
+            data-i18n="password_next"
+          >
+            مرحله بعد (تایید رمز)
+          </button>
 
+          <!-- نوار قدرت رمز -->
           <div class="password-strength" id="passwordStrength">
             <div class="password-strength__bar">
               <div
@@ -141,17 +156,108 @@
             </p>
           </div>
 
+          <!-- قوانین رمز -->
           <ul class="password-rules">
-            <li>حداقل ۱۰ کاراکتر</li>
-            <li>ترکیبی از حروف بزرگ، کوچک، عدد و ترجیحاً نماد</li>
-            <li>از رمزهای قابل حدس (123456, password, qwerty و...) استفاده نکنید</li>
+            <li id="rule-length" class="password-rule">
+              <span class="password-rule__icon">○</span>
+              <span class="password-rule__text" data-i18n="rule_length">
+                حداقل ۸ کاراکتر
+              </span>
+            </li>
+            <li id="rule-digit" class="password-rule">
+              <span class="password-rule__icon">○</span>
+              <span class="password-rule__text" data-i18n="rule_digit">
+                حداقل یک عدد
+              </span>
+            </li>
+            <li id="rule-mixedcase" class="password-rule">
+              <span class="password-rule__icon">○</span>
+              <span class="password-rule__text" data-i18n="rule_mixedcase">
+                ترکیب حروف کوچک و بزرگ انگلیسی
+              </span>
+            </li>
+            <li id="rule-special" class="password-rule">
+              <span class="password-rule__icon">○</span>
+              <span class="password-rule__text" data-i18n="rule_special">
+                حداقل یک کاراکتر خاص (!@#$...)
+              </span>
+            </li>
+            <li id="rule-english" class="password-rule">
+              <span class="password-rule__icon">○</span>
+              <span class="password-rule__text" data-i18n="rule_english">
+                فقط حروف/اعداد انگلیسی (بدون حروف فارسی و ...)
+              </span>
+            </li>
           </ul>
+
+          <!-- مرحله ۲: تایید رمز -->
+          <div class="field field--inline field--confirm" id="confirmFieldContainer" hidden>
+            <label
+              class="field__label field__label--inline"
+              for="passwordConfirmInput"
+              data-i18n="password_confirm_label"
+            >
+              تکرار رمز عبور
+            </label>
+            <div class="field__input-wrapper">
+              <input
+                type="password"
+                id="passwordConfirmInput"
+                class="field__input"
+                placeholder="تکرار رمز برای اطمینان"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="field__icon-btn"
+                id="passwordConfirmToggleBtn"
+                aria-label="نمایش موقت رمز تاییدی"
+              >
+                👁
+              </button>
+            </div>
+            <p class="field__hint" id="passwordMatchHint"></p>
+          </div>
+
+          <!-- کپچا -->
+          <div class="captcha">
+            <div class="captcha__label-row">
+              <span class="field__label" data-i18n="captcha_label">کپچا (برای تایید انسان بودن)</span>
+              <button
+                type="button"
+                class="captcha__refresh-btn"
+                id="captchaRefreshBtn"
+                aria-label="تغییر کپچا"
+              >
+                ⟳
+              </button>
+            </div>
+            <div class="captcha__content">
+              <div class="captcha__image" id="captchaText">AB12C</div>
+              <input
+                type="text"
+                id="captchaInput"
+                class="field__input captcha__input"
+                placeholder="کد کپچا را وارد کنید"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
+          <!-- کپچاهای مخفی برای منحرف کردن ربات‌ها -->
+          <input
+            type="text"
+            id="botTrap"
+            class="bot-trap"
+            autocomplete="off"
+            aria-hidden="true"
+          />
         </div>
       </section>
 
       <!-- دکمه شروع و وضعیت -->
       <section class="actions">
-        <button class="btn btn--primary actions__start-btn" id="startBtn">
+        <button class="btn btn--primary actions__start-btn" id="startBtn" data-i18n="start_btn">
           شروع عملیات
         </button>
         <p class="actions__caption" id="currentModeText">
@@ -161,7 +267,7 @@
 
       <!-- پیشرفت و پیام‌ها -->
       <section class="status" id="statusSection">
-        <h3 class="status__title">وضعیت و لاگ</h3>
+        <h3 class="status__title" data-i18n="status_title">وضعیت و لاگ</h3>
 
         <div class="progress" id="progressContainer" hidden>
           <div class="progress__bar">
@@ -181,20 +287,35 @@
     </main>
 
     <footer class="footer">
-      <p class="footer__text">
+      <p class="footer__text" data-i18n="footer_main">
         SAFE – E2Ebox | این نسخه فقط روی دستگاه شما کار می‌کند و فایل خام را
         به سرور ارسال نمی‌کند.
       </p>
-      <p class="footer__text footer__text--muted">
+      <p class="footer__text footer__text--muted" data-i18n="footer_secondary">
         در نسخه‌های بعدی، اتصال امن به ربات تلگرام، Cloudflare Worker و مدیریت
         سهمیه ماهانه اضافه می‌شود.
       </p>
     </footer>
   </div>
 
-  <!-- در آینده این اسکریپت برای کار در Telegram WebApp استفاده می‌شود -->
-  <!-- <script src="https://telegram.org/js/telegram-web-app.js"></script> -->
+  <!-- مودال مرکزی برای همه پاپ‌آپ‌ها -->
+  <div id="modalBackdrop" class="modal-backdrop" hidden>
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title" id="modalTitle">پیام سیستم</h3>
+      </div>
+      <div class="modal__body">
+        <p id="modalMessage">متن پیام اینجا نمایش داده می‌شود.</p>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--primary" id="modalCloseBtn">
+          باشه
+        </button>
+      </div>
+    </div>
+  </div>
 
+  <!-- <script src="https://telegram.org/js/telegram-web-app.js"></script> -->
   <script src="script.js"></script>
 </body>
 </html>
