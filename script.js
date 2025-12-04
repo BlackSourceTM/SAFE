@@ -1,6 +1,26 @@
 (function(w,d){
-function initTheme(){var root=d.documentElement;var btn=d.querySelector(".theme-toggle");if(!btn)return;var saved=null;try{saved=localStorage.getItem("safe-theme");}catch(e){}if(saved==="light"||saved==="dark")root.setAttribute("data-theme",saved);btn.addEventListener("click",function(){var cur=root.getAttribute("data-theme")==="light"?"light":"dark";var next=cur==="dark"?"light":"dark";root.setAttribute("data-theme",next);try{localStorage.setItem("safe-theme",next);}catch(e){}});}
-function initMode(){var switcher=d.querySelector(".mode-switcher");if(!switcher)return;var btns=switcher.querySelectorAll(".mode-switcher__btn");var encFlow=d.getElementById("encryptFlow");var decFlow=d.getElementById("decryptFlow");function setMode(mode){for(var i=0;i<btns.length;i++){var b=btns[i];var active=b.getAttribute("data-mode")===mode;b.classList.toggle("mode-switcher__btn--active",active);b.setAttribute("aria-selected",active?"true":"false")}var isEnc=mode==="encrypt";if(encFlow)encFlow.hidden=!isEnc;if(decFlow)decFlow.hidden=isEnc;}for(var j=0;j<btns.length;j++){btns[j].addEventListener("click",function(){var m=this.getAttribute("data-mode")==="decrypt"?"decrypt":"encrypt";setMode(m)})}setMode("encrypt");}
-function init(){if(w.SAFE_LANG&&w.SAFE_LANG.init)w.SAFE_LANG.init();initTheme();initMode();if(w.SAFE_ENCRYPT_UI&&w.SAFE_ENCRYPT_UI.init)w.SAFE_ENCRYPT_UI.init();if(w.SAFE_DECRYPT_UI&&w.SAFE_DECRYPT_UI.init)w.SAFE_DECRYPT_UI.init();}
+function initNav(){
+  var items=Array.from(d.querySelectorAll(".nav-item"));
+  var sections=Array.from(d.querySelectorAll(".panel-section"));
+  if(!items.length||!sections.length)return;
+  function activate(key){
+    items.forEach(function(b){
+      var active=b.getAttribute("data-section")===key;
+      b.classList.toggle("nav-item--active",active);
+    });
+    sections.forEach(function(s){
+      var id="section-"+key;
+      s.classList.toggle("panel-section--active",s.id===id);
+    });
+  }
+  items.forEach(function(b){
+    b.addEventListener("click",function(){
+      var key=this.getAttribute("data-section");
+      if(key)activate(key);
+    });
+  });
+  activate("crypto");
+}
+function init(){initNav()}
 if(d.readyState==="loading")d.addEventListener("DOMContentLoaded",init);else init();
 })(window,document);
