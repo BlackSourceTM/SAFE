@@ -1,9 +1,73 @@
 (function(w){
-var enc=new TextEncoder(),dec=new TextDecoder();
-function deriveKey(pw,salt){return crypto.subtle.importKey("raw",enc.encode(pw),{name:"PBKDF2"},false,["deriveKey"]).then(function(mat){return crypto.subtle.deriveKey({name:"PBKDF2",salt:salt,iterations:310000,hash:"SHA-256"},mat,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);});}
-function writeU32(b,o,v){b[o]=(v>>>24)&255;b[o+1]=(v>>>16)&255;b[o+2]=(v>>>8)&255;b[o+3]=v&255;}
-function readU32(b,o){return((b[o]<<24)|(b[o+1]<<16)|(b[o+2]<<8)|b[o+3])>>>0;}
-function encryptFileToSafe(file,password,onProgress){if(!crypto||!crypto.subtle)return Promise.reject(new Error("مرورگر شما از Web Crypto API پشتیبانی نمی‌کند."));function prog(p,t){if(typeof onProgress==="function")onProgress(p,t);}prog(5,"در حال خواندن فایل...");return file.arrayBuffer().then(function(plain){prog(20,"در حال آماده‌سازی کلید...");var salt=new Uint8Array(16);crypto.getRandomValues(salt);return deriveKey(password,salt).then(function(key){prog(35,"در حال ساخت هدر SAFE...");var headerIv=new Uint8Array(12);var dataIv=new Uint8Array(12);crypto.getRandomValues(headerIv);crypto.getRandomValues(dataIv);var meta={v:1,name:file.name,size:file.size,type:file.type||"application/octet-stream",createdAt:new Date().toISOString()};var headerPlain=enc.encode(JSON.stringify(meta));return crypto.subtle.encrypt({name:"AES-GCM",iv:headerIv},key,headerPlain).then(function(hcAb){var headerCipher=new Uint8Array(hcAb);prog(60,"در حال رمزنگاری محتوای فایل...");return crypto.subtle.encrypt({name:"AES-GCM",iv:dataIv},key,plain).then(function(dcAb){var dataCipher=new Uint8Array(dcAb);prog(85,"در حال ساخت فایل خروجی SAFE...");var magic=enc.encode("SAFE");var saltLen=salt.length,headerIvLen=headerIv.length,dataIvLen=dataIv.length,headerCipherLen=headerCipher.length;var headerLen=magic.length+1+1+1+1+1+4+saltLen+headerIvLen+dataIvLen+headerCipherLen;var out=new Uint8Array(headerLen+dataCipher.length);var off=0;out.set(magic,off);off+=magic.length;out[off++]=1;out[off++]=0;out[off++]=saltLen;out[off++]=headerIvLen;out[off++]=dataIvLen;writeU32(out,off,headerCipherLen);off+=4;out.set(salt,off);off+=saltLen;out.set(headerIv,off);off+=headerIvLen;out.set(dataIv,off);off+=dataIvLen;out.set(headerCipher,off);off+=headerCipherLen;out.set(dataCipher,off);prog(100,"رمزنگاری با موفقیت انجام شد.");return{buffer:out.buffer,metadata:meta};});});});});}
-function decryptSafeFile(file,password,onProgress){if(!crypto||!crypto.subtle)return Promise.reject(new Error("مرورگر شما از Web Crypto API پشتیبانی نمی‌کند."));function prog(p,t){if(typeof onProgress==="function")onProgress(p,t);}prog(5,"در حال خواندن فایل SAFE...");return file.arrayBuffer().then(function(ab){var buf=new Uint8Array(ab);var off=0;var magic=dec.decode(buf.subarray(0,4));if(magic!=="SAFE")throw new Error("این فایل با فرمت SAFE سازگار نیست.");off+=4;var version=buf[off++];var flags=buf[off++];if(version!==1)throw new Error("نسخه فایل SAFE پشتیبانی نمی‌شود.");var saltLen=buf[off++];var headerIvLen=buf[off++];var dataIvLen=buf[off++];var headerCipherLen=readU32(buf,off);off+=4;var salt=buf.subarray(off,off+saltLen);off+=saltLen;var headerIv=buf.subarray(off,off+headerIvLen);off+=headerIvLen;var dataIv=buf.subarray(off,off+dataIvLen);off+=dataIvLen;var headerCipher=buf.subarray(off,off+headerCipherLen);off+=headerCipherLen;var dataCipher=buf.subarray(off);prog(25,"در حال مشتق‌سازی کلید از رمز عبور...");return deriveKey(password,salt).then(function(key){prog(45,"در حال رمزگشایی اطلاعات هدر...");return crypto.subtle.decrypt({name:"AES-GCM",iv:headerIv},key,headerCipher).then(function(hpAb){var headerPlain=new Uint8Array(hpAb);var meta;try{meta=JSON.parse(dec.decode(headerPlain));}catch(e){throw new Error("رمز عبور نادرست است یا هدر فایل آسیب دیده است.");}prog(75,"در حال رمزگشایی محتوای فایل...");return crypto.subtle.decrypt({name:"AES-GCM",iv:dataIv},key,dataCipher).then(function(dpAb){prog(100,"رمزگشایی با موفقیت انجام شد.");return{buffer:dpAb,metadata:meta};});});});});}
-w.SAFE_CRYPTO={encryptFileToSafe:encryptFileToSafe,decryptSafeFile:decryptSafeFile};
+var te=new TextEncoder(),td=new TextDecoder();
+function s2b(str){return te.encode(str)}
+function b2s(buf){return td.decode(buf)}
+function rnd(len){var a=new Uint8Array(len);crypto.getRandomValues(a);return a}
+function concat(parts){var len=0;for(var i=0;i<parts.length;i++)len+=parts[i].length;var out=new Uint8Array(len),off=0;for(i=0;i<parts.length;i++){out.set(parts[i],off);off+=parts[i].length}return out}
+function u32to4(v){return new Uint8Array([(v>>>24)&255,(v>>>16)&255,(v>>>8)&255,v&255])}
+function u4tou32(b){return((b[0]<<24)|(b[1]<<16)|(b[2]<<8)|b[3])>>>0}
+function deriveKey(pwdBytes,salt){return crypto.subtle.importKey("raw",pwdBytes,"PBKDF2",!1,["deriveKey"]).then(function(base){return crypto.subtle.deriveKey({name:"PBKDF2",salt:salt,iterations:210000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},!1,["encrypt","decrypt"])})}
+function aesEnc(key,iv,data){return crypto.subtle.encrypt({name:"AES-GCM",iv:iv},key,data)}
+function aesDec(key,iv,data){return crypto.subtle.decrypt({name:"AES-GCM",iv:iv},key,data)}
+function readFileAsArrayBuffer(file){return new Promise(function(res,rej){var r=new FileReader();r.onerror=function(){rej(new Error("FILE_READ_ERROR"))};r.onload=function(){res(r.result)};r.readAsArrayBuffer(file)})}
+function baseNameNoExt(name){var i=name.lastIndexOf(".");if(i<=0)return name;return name.slice(0,i)}
+var MAGIC=s2b("SAFE");
+function encryptFile(file,password,onProgress){
+  if(!file||!password)return Promise.reject(new Error("INVALID_INPUT"));
+  onProgress&&onProgress(0,"start");
+  var pwdBytes=s2b(password),salt=rnd(16),nonceH=rnd(12),nonceD=rnd(12),fileBuf;
+  return readFileAsArrayBuffer(file).then(function(buf){
+    fileBuf=buf;
+    onProgress&&onProgress(.25,"key");
+    return deriveKey(pwdBytes,salt)
+  }).then(function(key){
+    onProgress&&onProgress(.45,"header");
+    var headerObj={name:file.name,size:file.size,type:file.type||"",ts:Date.now()};
+    var headerJson=s2b(JSON.stringify(headerObj));
+    return Promise.all([aesEnc(key,nonceH,headerJson),aesEnc(key,nonceD,fileBuf)]).then(function(res){
+      var h=new Uint8Array(res[0]),c=new Uint8Array(res[1]);
+      var headerLen=u32to4(h.length);
+      var ver=new Uint8Array([1]);
+      var out=concat([MAGIC,ver,nonceH,nonceD,salt,headerLen,h,c]);
+      onProgress&&onProgress(1,"done");
+      var safeName=baseNameNoExt(file.name)||"file";
+      safeName+=".SAFE";
+      return{blob:new Blob([out],{type:"application/octet-stream"}),name:safeName,meta:headerObj}
+    })
+  })
+}
+function decryptFile(file,password,onProgress){
+  if(!file||!password)return Promise.reject(new Error("INVALID_INPUT"));
+  onProgress&&onProgress(0,"start");
+  var pwdBytes=s2b(password),buf;
+  return readFileAsArrayBuffer(file).then(function(ab){
+    buf=new Uint8Array(ab);
+    if(buf.length<4+1+12+12+16+4)throw new Error("FILE_TOO_SMALL");
+    var magic=buf.slice(0,4);
+    for(var i=0;i<4;i++)if(magic[i]!==MAGIC[i])throw new Error("BAD_MAGIC");
+    var ver=buf[4];if(ver!==1)throw new Error("BAD_VERSION");
+    var off=5;
+    var nonceH=buf.slice(off,off+12);off+=12;
+    var nonceD=buf.slice(off,off+12);off+=12;
+    var salt=buf.slice(off,off+16);off+=16;
+    var headerLen=u4tou32(buf.slice(off,off+4));off+=4;
+    if(buf.length<off+headerLen)throw new Error("BAD_HEADER_LEN");
+    var headerEnc=buf.slice(off,off+headerLen);off+=headerLen;
+    var cipher=buf.slice(off);
+    onProgress&&onProgress(.3,"key");
+    return deriveKey(pwdBytes,salt).then(function(key){
+      onProgress&&onProgress(.55,"header");
+      return Promise.all([aesDec(key,nonceH,headerEnc),aesDec(key,nonceD,cipher)]).then(function(res){
+        var headerJson=b2s(new Uint8Array(res[0]));
+        var meta;
+        try{meta=JSON.parse(headerJson)}catch(e){throw new Error("BAD_HEADER_JSON")}
+        onProgress&&onProgress(1,"done");
+        var outBlob=new Blob([res[1]],{type:meta.type||"application/octet-stream"});
+        var outName=meta.name||"file";
+        return{blob:outBlob,name:outName,meta:meta}
+      })
+    })
+  })
+}
+w.SAFE_CRYPTO={encryptFile:encryptFile,decryptFile:decryptFile};
 })(window);
