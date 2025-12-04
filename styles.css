@@ -1,5 +1,4 @@
 /* styles.css */
-
 /* =========================================
    Font & Base Variables
    ========================================= */
@@ -481,6 +480,7 @@
     padding: 0.25rem;
     box-shadow: var(--shadow-soft-sm);
     overflow: hidden;
+    direction: ltr;
   }
   
   html[data-theme="light"] .mode-switcher {
