@@ -1,467 +1,605 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <title data-i18n="app_title">SAFE – E2Ebox | Mini App</title>
+  <title>SAFE – E2Ebox | Mini App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="SAFE – E2Ebox: رمزنگاری سرتاسری و ایمن فایل‌ها فقط روی دستگاه شما، بدون ارسال کلید به سرور.">
+  <meta name="color-scheme" content="dark light">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app">
+  <div class="app-shell">
     <!-- Header -->
     <header class="app-header">
-      <div class="app-header__brand">
-        <div class="brand-logo" aria-hidden="true">
-          <img src="Avatar.png" alt="SAFE – E2Ebox" class="brand-logo__img">
-        </div>
-        <div class="brand-text">
-          <h1 class="brand-text__title" data-i18n="brand_title">
-            SAFE – E2Ebox
-            <span class="brand-badge brand-badge--verified" aria-label="SAFE verified">
-              <svg class="brand-badge__icon" viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="11" fill="#3390ec"></circle>
-                <path d="M17.2 8.6 10.5 15.3 7 11.8 8.4 10.4 10.5 12.5 15.8 7.2z" fill="#ffffff"></path>
-              </svg>
-            </span>
-          </h1>
-          <p class="brand-text__subtitle" data-i18n="brand_subtitle">
-            رمزنگاری سرتاسری فایل‌ها فقط روی دستگاه شما
-          </p>
-        </div>
-      </div>
-
-      <div class="app-header__actions">
-        <div class="user-pill">
-          <div class="user-pill__avatar" id="safeUserAvatar" aria-hidden="true"></div>
-          <div class="user-pill__meta">
-            <div class="user-pill__name" id="safeUserName">@username</div>
-            <div class="user-pill__id" id="safeUserId">00000000</div>
+      <div class="app-header__left">
+        <div class="brand-chip">
+          <div class="brand-chip__icon" aria-hidden="true">🔒</div>
+          <div class="brand-chip__text">
+            <div class="brand-chip__title">
+              SAFE – E2Ebox
+              <img src="tick.png" alt="" style="width:16px;height:16px;vertical-align:middle;object-fit:contain;margin-left:1px;">
+            </div>
+            <div class="brand-chip__subtitle">Secure Asynchronous File Encryption</div>
           </div>
         </div>
-
-        <button class="chip chip--ghost lang-toggle" type="button" aria-label="تغییر زبان" data-i18n="lang_toggle">
-          EN / FA
-        </button>
-
-        <button class="chip chip--icon theme-toggle" type="button" aria-label="تغییر تم (روشن / تیره)">
-          <span class="theme-toggle__icon" aria-hidden="true"></span>
-        </button>
+      </div>
+      <div class="app-header__right">
+        <div class="user-pill">
+          <div class="user-pill__avatar" aria-hidden="true">S</div>
+          <div class="user-pill__meta">
+            <span class="user-pill__name">@username</span>
+            <span class="user-pill__hint">Telegram account</span>
+          </div>
+        </div>
       </div>
     </header>
 
-    <!-- Hero -->
+    <!-- Main layout -->
     <main class="app-main">
-      <section class="hero">
-        <div class="hero__content">
-          <h2 class="hero__title typing-effect" data-i18n="hero_title">
-            Mini App SAFE – رمزنگاری واقعی روی دستگاه شما
-          </h2>
-          <p class="hero__subtitle" data-i18n="hero_subtitle">
-            SAFE – E2Ebox یک مینی‌اپ تحت تلگرام است که فایل‌های شما را تنها روی دستگاه خودتان رمزنگاری و رمزگشایی می‌کند؛ بدون ارسال کلیدها به سرور.
-          </p>
-        </div>
-        <div class="hero__hint" role="status" data-i18n="hero_hint">
-          ✨ این رابط کاربری فقط روی مرورگر شما اجرا می‌شود. منطق رمزنگاری، اتصال به ربات تلگرام و سرور بعداً متصل می‌شوند.
-        </div>
+      <section class="intro-strip">
+        <h1 class="intro-strip__title">SAFE control panel</h1>
+        <p class="intro-strip__subtitle">
+          Manage all SAFE actions from one place: encryption, decryption, keys, profile,
+          payments, coins and support. All crypto operations will run only on your device;
+          this interface is just the controller.
+        </p>
       </section>
 
-      <!-- Mode switch strip -->
-      <section class="mode-strip" aria-label="انتخاب حالت" role="tablist">
-        <div class="mode-switcher">
-          <button
-            class="mode-switcher__btn mode-switcher__btn--active"
-            type="button"
-            role="tab"
-            aria-selected="true"
-            data-mode="encrypt"
-            data-i18n="mode_encrypt"
-          >
-            رمزنگاری فایل (Encrypt)
-          </button>
+      <div class="layout">
+        <!-- Primary navigation (left column) -->
+        <nav class="nav">
+          <!-- Group: Crypto operations -->
+          <section class="nav-group">
+            <h2 class="nav-group__title">Crypto operations</h2>
+            <button class="nav-item nav-item--active" data-section="crypto">
+              <span class="nav-item__label">Encryption / Decryption</span>
+              <span class="nav-item__hint">
+                Start new jobs or review recent activity
+              </span>
+            </button>
+          </section>
 
-          <button
-            class="mode-switcher__btn"
-            type="button"
-            role="tab"
-            aria-selected="false"
-            data-mode="decrypt"
-            data-i18n="mode_decrypt"
-          >
-            رمزگشایی فایل (Decrypt)
-          </button>
+          <!-- Group: Keys & profile -->
+          <section class="nav-group">
+            <h2 class="nav-group__title">Account & keys</h2>
+            <button class="nav-item" data-section="key">
+              <span class="nav-item__label">Key status</span>
+              <span class="nav-item__hint">
+                View and manage your personal encryption key
+              </span>
+            </button>
+            <button class="nav-item" data-section="profile">
+              <span class="nav-item__label">My profile</span>
+              <span class="nav-item__hint">
+                Plan, limits, status and global usage
+              </span>
+            </button>
+          </section>
 
-          <div class="mode-switcher__indicator" aria-hidden="true"></div>
-        </div>
-      </section>
+          <!-- Group: Money / store -->
+          <section class="nav-group">
+            <h2 class="nav-group__title">Billing & coins</h2>
+            <button class="nav-item" data-section="transactions">
+              <span class="nav-item__label">Transactions</span>
+              <span class="nav-item__hint">
+                All payments and financial events
+              </span>
+            </button>
+            <button class="nav-item" data-section="store">
+              <span class="nav-item__label">Store</span>
+              <span class="nav-item__hint">
+                Buy SAFE coins or upgrade your plan
+              </span>
+            </button>
+            <button class="nav-item" data-section="coins">
+              <span class="nav-item__label">My coins</span>
+              <span class="nav-item__hint">
+                Balance, referrals and coin transfers
+              </span>
+            </button>
+          </section>
 
-      <!-- Panels -->
-      <section class="panels">
-        <!-- Encrypt panel -->
-        <section
-          class="panel panel--active"
-          id="panel-encrypt"
-          data-panel="encrypt"
-          role="tabpanel"
-          aria-labelledby="mode-encrypt"
-        >
-          <header class="panel__header">
-            <h3 class="panel__title" data-i18n="encrypt_title">رمزنگاری فایل جدید</h3>
-            <p class="panel__text" data-i18n="encrypt_text">
-              فایل خود را انتخاب کنید، رمز عبور قدرتمند تعیین کنید و خروجی .SAFE را ذخیره کنید. تمام مراحل فقط روی دستگاه شما انجام می‌شود.
-            </p>
-          </header>
+          <!-- Group: Support -->
+          <section class="nav-group">
+            <h2 class="nav-group__title">Support & policy</h2>
+            <button class="nav-item" data-section="support">
+              <span class="nav-item__label">Support & rules</span>
+              <span class="nav-item__hint">
+                Help, contact, usage rules and privacy
+              </span>
+            </button>
+          </section>
+        </nav>
 
-          <div class="panel__grid">
-            <!-- File select -->
-            <article class="card card--glass">
-              <header class="card__header">
-                <h4 class="card__title" data-i18n="encrypt_file_card_title">انتخاب فایل</h4>
-                <p class="card__subtitle" data-i18n="encrypt_file_card_sub">
-                  فایل موردنظر را انتخاب کنید یا به این بخش بکشید و رها کنید.
-                </p>
-              </header>
-              <div
-                class="dropzone"
-                role="button"
-                tabindex="0"
-                aria-label="منطقه انتخاب و درگ‌ودراپ فایل"
-                aria-describedby="encryptDropzoneDescription encryptSelectedFile"
-              >
-                <div class="dropzone__icon" aria-hidden="true">📁</div>
-                <p id="encryptDropzoneDescription" class="dropzone__text" data-i18n="encrypt_drop_help">
-                  برای انتخاب فایل کلیک کنید یا آن را اینجا رها کنید.
-                </p>
-                <p
-                  id="encryptSelectedFile"
-                  class="dropzone__selected"
-                  data-i18n="encrypt_drop_selected"
-                  data-i18n-placeholder="encrypt_drop_selected"
-                >
-                  هنوز فایلی انتخاب نشده است.
-                </p>
-                <input
-                  id="encryptFileInput"
-                  class="dropzone__input"
-                  type="file"
-                  aria-hidden="true"
-                  tabindex="-1"
-                />
-              </div>
-              <p class="card__hint" data-i18n="encrypt_file_limit">
-                حداکثر حجم مجاز در نسخه فعلی: ۵۰۰ مگابایت در ماه (فعلاً صرفاً نمایشی).
+        <!-- Content area (right column) -->
+        <section class="content">
+
+          <!-- Section: Crypto operations -->
+          <section class="panel-section panel-section--active" id="section-crypto">
+            <header class="panel-section__header">
+              <h2 class="panel-section__title">Crypto operations</h2>
+              <p class="panel-section__subtitle">
+                Start a fresh encryption or decryption job, or review the latest sessions.
               </p>
+            </header>
+
+            <div class="panel-grid">
+              <!-- Encrypt column -->
+              <article class="panel-card">
+                <header class="panel-card__header">
+                  <h3 class="panel-card__title">Encrypt</h3>
+                  <p class="panel-card__subtitle">
+                    Protect a new file on your device and get a <code>.SAFE</code> file as result.
+                  </p>
+                </header>
+                <div class="panel-card__body">
+                  <div class="option-list">
+                    <button class="option-item">
+                      <div class="option-item__main">
+                        <span class="option-item__label">Start new encryption</span>
+                        <span class="option-item__hint">
+                          Choose a file, set a strong password and create a new SAFE file.
+                        </span>
+                      </div>
+                      <span class="option-item__badge">New</span>
+                    </button>
+                    <button class="option-item option-item--secondary">
+                      <div class="option-item__main">
+                        <span class="option-item__label">Recent encryptions</span>
+                        <span class="option-item__hint">
+                          See the last 10 encryption jobs with size, date, status and coins used.
+                        </span>
+                      </div>
+                    </button>
+                    <button class="option-item option-item--ghost">
+                      <div class="option-item__main">
+                        <span class="option-item__label">Back to main menu</span>
+                        <span class="option-item__hint">
+                          Return to the primary SAFE menu in the bot.
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Decrypt column -->
+              <article class="panel-card">
+                <header class="panel-card__header">
+                  <h3 class="panel-card__title">Decrypt</h3>
+                  <p class="panel-card__subtitle">
+                    Open an existing <code>.SAFE</code> file and restore the original data.
+                  </p>
+                </header>
+                <div class="panel-card__body">
+                  <div class="option-list">
+                    <button class="option-item">
+                      <div class="option-item__main">
+                        <span class="option-item__label">Start new decryption</span>
+                        <span class="option-item__hint">
+                          Select a SAFE file, enter the password and recover the original file.
+                        </span>
+                      </div>
+                      <span class="option-item__badge">Free</span>
+                    </button>
+                    <button class="option-item option-item--secondary">
+                      <div class="option-item__main">
+                        <span class="option-item__label">Recent decryptions</span>
+                        <span class="option-item__hint">
+                          Review the last 10 decryption jobs and their results.
+                        </span>
+                      </div>
+                    </button>
+                    <button class="option-item option-item--ghost">
+                      <div class="option-item__main">
+                        <span class="option-item__label">Back to main menu</span>
+                        <span class="option-item__hint">
+                          Return to the primary SAFE menu in the bot.
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- Section: Key status -->
+          <section class="panel-section" id="section-key">
+            <header class="panel-section__header">
+              <h2 class="panel-section__title">Key status</h2>
+              <p class="panel-section__subtitle">
+                Overview of your personal encryption key: masked preview, last update,
+                status and last usage.
+              </p>
+            </header>
+
+            <article class="panel-card panel-card--wide">
+              <div class="panel-card__body panel-card__body--split">
+                <dl class="data-list">
+                  <div class="data-list__row">
+                    <dt>Masked key</dt>
+                    <dd><code>as••••xc</code></dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Status</dt>
+                    <dd><span class="tag tag--success">Active</span></dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Last updated</dt>
+                    <dd>—</dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Last used in crypto job</dt>
+                    <dd>—</dd>
+                  </div>
+                </dl>
+
+                <div class="option-list option-list--compact">
+                  <button class="option-item">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Register / update key</span>
+                      <span class="option-item__hint">
+                        Set or rotate your personal key. In some plans this is limited
+                        to once every 7 days.
+                      </span>
+                    </div>
+                  </button>
+                  <button class="option-item option-item--secondary">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Cancel key</span>
+                      <span class="option-item__hint">
+                        Mark the key as cancelled so files tied to it cannot be recovered.
+                      </span>
+                    </div>
+                  </button>
+                  <button class="option-item option-item--ghost">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Restore cancelled key</span>
+                      <span class="option-item__hint">
+                        Restore a previously cancelled key when allowed by your plan.
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              </div>
             </article>
+          </section>
 
-            <!-- Password + captcha -->
-            <article class="card card--glass card--stacked">
-              <header class="card__header">
-                <h4 class="card__title" data-i18n="encrypt_password_card_title">تعیین رمز عبور</h4>
-                <p class="card__subtitle" data-i18n="encrypt_password_card_sub">
-                  رمزی انتخاب کنید که حدس‌زدنش برای دیگران غیرممکن باشد؛ اما خودتان فراموشش نکنید.
-                </p>
-              </header>
+          <!-- Section: Profile -->
+          <section class="panel-section" id="section-profile">
+            <header class="panel-section__header">
+              <h2 class="panel-section__title">My profile</h2>
+              <p class="panel-section__subtitle">
+                High-level information about your SAFE account: ID, status, plan and usage.
+              </p>
+            </header>
 
-              <div class="card__body card__body--stacked">
-                <div class="field-group">
-                  <label class="field-label" for="encryptPassword" data-i18n="password_label">
-                    رمز عبور اصلی
-                  </label>
-                  <div class="field-input-wrapper">
-                    <input
-                      id="encryptPassword"
-                      class="field-input"
-                      type="password"
-                      inputmode="text"
-                      autocomplete="new-password"
-                      data-i18n-placeholder="password_placeholder"
-                      placeholder="یک رمز قوی وارد کنید..."
-                    />
-                    <button
-                      type="button"
-                      class="field-icon-btn field-icon-btn--magic"
-                      id="generatePasswordBtn"
-                      aria-label="تولید رمز قوی"
-                    >
-                      ✨
-                    </button>
-                    <button
-                      type="button"
-                      class="field-icon-btn field-icon-btn--eye"
-                      id="togglePasswordVisibility"
-                      aria-label="نمایش موقت رمز"
-                    >
-                      👁️
-                    </button>
+            <article class="panel-card panel-card--wide">
+              <div class="panel-card__body panel-card__body--split">
+                <dl class="data-list">
+                  <div class="data-list__row">
+                    <dt>Telegram user ID</dt>
+                    <dd>—</dd>
                   </div>
-                  <div class="password-meter">
-                    <div class="password-meter__bar" id="passwordStrengthBar"></div>
+                  <div class="data-list__row">
+                    <dt>First seen in SAFE</dt>
+                    <dd>—</dd>
                   </div>
-                  <ul class="password-rules" aria-live="polite">
-                    <li class="password-rule" data-rule="len" data-i18n="rule_len">
-                      حداقل ۸ کاراکتر
+                  <div class="data-list__row">
+                    <dt>Account status</dt>
+                    <dd><span class="tag tag--success">Active</span></dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Current plan</dt>
+                    <dd>Free plan</dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Plan expiration</dt>
+                    <dd>Unlimited for free tier</dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Total operations</dt>
+                    <dd>— (encrypt + decrypt + others)</dd>
+                  </div>
+                </dl>
+
+                <div class="option-list option-list--compact">
+                  <button class="option-item">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Upgrade plan</span>
+                      <span class="option-item__hint">
+                        Switch to Silver or Gold for better limits and speed.
+                      </span>
+                    </div>
+                  </button>
+                  <button class="option-item option-item--secondary">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Export full report</span>
+                      <span class="option-item__hint">
+                        Download detailed account report as an Excel file (paid plans only).
+                      </span>
+                    </div>
+                  </button>
+                  <button class="option-item option-item--ghost">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Delete account</span>
+                      <span class="option-item__hint">
+                        Start the 3-step account deletion flow with confirmation code.
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <!-- Section: Transactions -->
+          <section class="panel-section" id="section-transactions">
+            <header class="panel-section__header">
+              <h2 class="panel-section__title">Transactions</h2>
+              <p class="panel-section__subtitle">
+                All payments related to coins and plan upgrades, including failed or cancelled attempts.
+              </p>
+            </header>
+
+            <article class="panel-card panel-card--wide">
+              <div class="panel-card__body">
+                <div class="table">
+                  <div class="table__head">
+                    <div class="table__row">
+                      <div class="table__cell table__cell--head">Form ID</div>
+                      <div class="table__cell table__cell--head">Item</div>
+                      <div class="table__cell table__cell--head">Amount</div>
+                      <div class="table__cell table__cell--head">Invoice status</div>
+                      <div class="table__cell table__cell--head">Payment status</div>
+                    </div>
+                  </div>
+                  <div class="table__body">
+                    <div class="table__row table__row--empty">
+                      <div class="table__cell" colspan="5">
+                        No transactions yet. Once you purchase coins or upgrade a plan,
+                        they will appear here.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-actions">
+                  <button class="btn btn--primary btn--sm">Refresh list</button>
+                  <button class="btn btn--ghost btn--sm">
+                    Export as Excel (paid plans only)
+                  </button>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <!-- Section: Store -->
+          <section class="panel-section" id="section-store">
+            <header class="panel-section__header">
+              <h2 class="panel-section__title">Store</h2>
+              <p class="panel-section__subtitle">
+                Buy SAFE coins or upgrade your plan. Payments can be processed via
+                local gateways or Telegram TON wallet.
+              </p>
+            </header>
+
+            <div class="panel-grid panel-grid--stack">
+              <article class="panel-card">
+                <header class="panel-card__header">
+                  <h3 class="panel-card__title">Buy coins</h3>
+                  <p class="panel-card__subtitle">
+                    Choose a coin package and complete payment through your preferred method.
+                  </p>
+                </header>
+                <div class="panel-card__body">
+                  <ul class="package-list">
+                    <li class="package">
+                      <div class="package__main">
+                        <span class="package__name">50 SAFE coins</span>
+                        <span class="package__desc">Recommended for light usage.</span>
+                      </div>
+                      <div class="package__meta">
+                        <span class="package__price">≈ 1 USD</span>
+                        <button class="btn btn--primary btn--sm">Select</button>
+                      </div>
                     </li>
-                    <li class="password-rule" data-rule="digit" data-i18n="rule_digit">
-                      حداقل یک عدد
+                    <li class="package">
+                      <div class="package__main">
+                        <span class="package__name">100 SAFE coins</span>
+                        <span class="package__desc">Balanced for regular users.</span>
+                      </div>
+                      <div class="package__meta">
+                        <span class="package__price">≈ 2 USD</span>
+                        <button class="btn btn--primary btn--sm">Select</button>
+                      </div>
                     </li>
-                    <li class="password-rule" data-rule="case" data-i18n="rule_case">
-                      حروف کوچک و بزرگ انگلیسی
-                    </li>
-                    <li class="password-rule" data-rule="special" data-i18n="rule_special">
-                      حداقل یک کاراکتر ویژه
-                    </li>
-                    <li class="password-rule" data-rule="latin" data-i18n="rule_latin">
-                      فقط حروف و اعداد انگلیسی (بدون حروف فارسی و سایر زبان‌ها)
+                    <li class="package">
+                      <div class="package__main">
+                        <span class="package__name">500 SAFE coins</span>
+                        <span class="package__desc">Best value for heavy usage.</span>
+                      </div>
+                      <div class="package__meta">
+                        <span class="package__price">≈ 8 USD</span>
+                        <button class="btn btn--primary btn--sm">Select</button>
+                      </div>
                     </li>
                   </ul>
-                  <p class="password-meter__hint" data-i18n="password_hint">
-                    برای ادامه، رمز باید حداقل به سطح «قوی» برسد.
+                </div>
+              </article>
+
+              <article class="panel-card">
+                <header class="panel-card__header">
+                  <h3 class="panel-card__title">Upgrade plan</h3>
+                  <p class="panel-card__subtitle">
+                    Move from Free to Bronze, Silver or Gold and unlock higher limits and speed.
                   </p>
+                </header>
+                <div class="panel-card__body">
+                  <ul class="package-list">
+                    <li class="package">
+                      <div class="package__main">
+                        <span class="package__name">Bronze plan</span>
+                        <span class="package__desc">Basic paid tier with fair limits.</span>
+                      </div>
+                      <div class="package__meta">
+                        <span class="package__price">Entry level</span>
+                        <button class="btn btn--secondary btn--sm">Details</button>
+                      </div>
+                    </li>
+                    <li class="package">
+                      <div class="package__main">
+                        <span class="package__name">Silver plan</span>
+                        <span class="package__desc">
+                          Better performance and key flexibility.
+                        </span>
+                      </div>
+                      <div class="package__meta">
+                        <span class="package__price">Most popular</span>
+                        <button class="btn btn--secondary btn--sm">Details</button>
+                      </div>
+                    </li>
+                    <li class="package">
+                      <div class="package__main">
+                        <span class="package__name">Gold plan</span>
+                        <span class="package__desc">
+                          Priority queues and maximum throughput.
+                        </span>
+                      </div>
+                      <div class="package__meta">
+                        <span class="package__price">Pro users</span>
+                        <button class="btn btn--secondary btn--sm">Details</button>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
-
-                <div class="field-group">
-                  <label class="field-label" for="encryptPasswordConfirm" data-i18n="password_confirm_label">
-                    تکرار رمز عبور
-                  </label>
-                  <input
-                    id="encryptPasswordConfirm"
-                    class="field-input"
-                    type="password"
-                    inputmode="text"
-                    autocomplete="new-password"
-                    data-i18n-placeholder="password_confirm_placeholder"
-                    placeholder="رمز عبور را دوباره وارد کنید..."
-                  />
-                  <p class="field-hint" id="passwordMatchHint" data-i18n="password_match_hint">
-                    برای ادامه، دو رمز باید کاملاً یکسان باشند.
-                  </p>
-                </div>
-
-                <div class="field-group">
-                  <label class="field-label" data-i18n="captcha_label">
-                    کپچا – اثبات انسان بودن
-                  </label>
-                  <div class="captcha">
-                    <div class="captcha__visual" id="captchaVisual" aria-hidden="true">
-                      SAFE
-                    </div>
-                    <div class="captcha__controls">
-                      <input
-                        id="captchaInput"
-                        class="field-input field-input--sm"
-                        type="text"
-                        inputmode="text"
-                        autocomplete="off"
-                        data-i18n-placeholder="captcha_placeholder"
-                        placeholder="کد را وارد کنید..."
-                      />
-                      <button
-                        type="button"
-                        class="btn btn--ghost btn--sm"
-                        id="captchaRefreshBtn"
-                        aria-label="بازسازی کپچا"
-                      >
-                        ↻
-                      </button>
-                    </div>
-                    <p class="field-hint" data-i18n="captcha_hint">
-                      کپچا برای جلوگیری از ربات‌هاست؛ پاسخ شما در سرور ذخیره نمی‌شود.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="field-group field-group--submit">
-                  <button
-                    type="button"
-                    class="btn btn--primary btn--lg"
-                    id="startEncryptBtn"
-                    data-i18n="encrypt_start_btn"
-                  >
-                    شروع رمزنگاری
-                  </button>
-                  <p class="field-hint field-hint--muted" id="encryptModeHint" data-i18n="encrypt_mode_hint">
-                    حالت فعلی: رمزنگاری فایل جدید (.SAFE)
-                  </p>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <section class="progress-section" aria-live="polite">
-            <header class="progress-header">
-              <h4 class="progress-title" data-i18n="encrypt_progress_title">وضعیت رمزنگاری</h4>
-            </header>
-            <div class="progress-bar">
-              <div class="progress-bar__fill" id="encryptProgressBar"></div>
+              </article>
             </div>
-            <p class="progress-status" id="encryptProgressStatus" data-i18n="encrypt_progress_status">
-              در انتظار شروع عملیات...
-            </p>
           </section>
-        </section>
 
-        <!-- Decrypt panel -->
-        <section
-          class="panel"
-          id="panel-decrypt"
-          data-panel="decrypt"
-          role="tabpanel"
-          aria-labelledby="mode-decrypt"
-          hidden
-        >
-          <header class="panel__header">
-            <h3 class="panel__title" data-i18n="decrypt_title">رمزگشایی فایل .SAFE</h3>
-            <p class="panel__text" data-i18n="decrypt_text">
-              فایل .SAFE خود را انتخاب کنید، رمز عبوری را که هنگام رمزنگاری تعیین کرده بودید وارد کنید و
-              نسخه اصلی فایل را بازیابی کنید.
-            </p>
-          </header>
-
-          <div class="panel__grid">
-            <!-- File select -->
-            <article class="card card--glass">
-              <header class="card__header">
-                <h4 class="card__title" data-i18n="decrypt_file_card_title">انتخاب فایل .SAFE</h4>
-                <p class="card__subtitle" data-i18n="decrypt_file_card_sub">
-                  فایل خروجی رمزنگاری (.SAFE) را از دستگاه خود انتخاب کنید.
-                </p>
-              </header>
-              <div
-                class="dropzone"
-                role="button"
-                tabindex="0"
-                aria-label="منطقه انتخاب و درگ‌ودراپ فایل .SAFE"
-                aria-describedby="decryptDropzoneDescription decryptSelectedFile"
-              >
-                <div class="dropzone__icon" aria-hidden="true">📂</div>
-                <p id="decryptDropzoneDescription" class="dropzone__text" data-i18n="decrypt_drop_help">
-                  برای انتخاب فایل کلیک کنید یا آن را اینجا رها کنید.
-                </p>
-                <p
-                  id="decryptSelectedFile"
-                  class="dropzone__selected"
-                  data-i18n="decrypt_drop_selected"
-                  data-i18n-placeholder="decrypt_drop_selected"
-                >
-                  هنوز فایلی انتخاب نشده است.
-                </p>
-                <input
-                  id="decryptFileInput"
-                  class="dropzone__input"
-                  type="file"
-                  accept=".SAFE,.safe"
-                  aria-hidden="true"
-                  tabindex="-1"
-                />
-              </div>
-              <p class="card__hint" data-i18n="decrypt_file_hint">
-                اگر فایل اصلی روی دستگاه شما نیست، نمی‌توان آن را بازیابی کرد.
+          <!-- Section: My coins -->
+          <section class="panel-section" id="section-coins">
+            <header class="panel-section__header">
+              <h2 class="panel-section__title">My coins</h2>
+              <p class="panel-section__subtitle">
+                See your SAFE coin balance, referral stats and send coins to other users.
               </p>
-            </article>
+            </header>
 
-            <!-- Password + captcha -->
-            <article class="card card--glass card--stacked">
-              <header class="card__header">
-                <h4 class="card__title" data-i18n="decrypt_password_card_title">رمز عبور برای رمزگشایی</h4>
-                <p class="card__subtitle" data-i18n="decrypt_password_card_sub">
-                  رمزی را که هنگام رمزنگاری انتخاب کرده بودید، وارد کنید تا فایل اصلی بازیابی شود.
-                </p>
-              </header>
-
-              <div class="card__body card__body--stacked">
-                <div class="field-group">
-                  <label class="field-label" for="decryptPassword" data-i18n="decrypt_password_label">
-                    رمز عبور
-                  </label>
-                  <input
-                    id="decryptPassword"
-                    class="field-input"
-                    type="password"
-                    inputmode="text"
-                    autocomplete="current-password"
-                    data-i18n-placeholder="decrypt_password_placeholder"
-                    placeholder="رمز عبور را وارد کنید..."
-                  />
-                </div>
-
-                <div class="field-group">
-                  <label class="field-label" data-i18n="captcha_label">
-                    کپچا – اثبات انسان بودن
-                  </label>
-                  <div class="captcha">
-                    <div class="captcha__visual" id="captchaVisualDecrypt" aria-hidden="true">
-                      SAFE
-                    </div>
-                    <div class="captcha__controls">
-                      <input
-                        id="captchaInputDecrypt"
-                        class="field-input field-input--sm"
-                        type="text"
-                        inputmode="text"
-                        autocomplete="off"
-                        data-i18n-placeholder="captcha_placeholder"
-                        placeholder="کد را وارد کنید..."
-                      />
-                      <button
-                        type="button"
-                        class="btn btn--ghost btn--sm"
-                        id="captchaRefreshBtnDecrypt"
-                        aria-label="بازسازی کپچا"
-                      >
-                        ↻
-                      </button>
-                    </div>
-                    <p class="field-hint" data-i18n="captcha_hint">
-                      کپچا برای جلوگیری از ربات‌هاست؛ پاسخ شما در سرور ذخیره نمی‌شود.
-                    </p>
+            <article class="panel-card panel-card--wide">
+              <div class="panel-card__body panel-card__body--split">
+                <dl class="data-list">
+                  <div class="data-list__row">
+                    <dt>Total coins</dt>
+                    <dd>0</dd>
                   </div>
-                </div>
+                  <div class="data-list__row">
+                    <dt>Received coins</dt>
+                    <dd>0</dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Last received from</dt>
+                    <dd>—</dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Sent coins</dt>
+                    <dd>0</dd>
+                  </div>
+                  <div class="data-list__row">
+                    <dt>Last sent to</dt>
+                    <dd>—</dd>
+                  </div>
+                </dl>
 
-                <div class="field-group field-group--submit">
-                  <button
-                    type="button"
-                    class="btn btn--primary btn--lg"
-                    id="startDecryptBtn"
-                    data-i18n="decrypt_start_btn"
-                  >
-                    شروع رمزگشایی
+                <div class="option-list option-list--compact">
+                  <button class="option-item">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Increase coins</span>
+                      <span class="option-item__hint">
+                        Buy coins from the store or earn via referrals.
+                      </span>
+                    </div>
                   </button>
-                  <p class="field-hint field-hint--muted" id="decryptModeHint" data-i18n="decrypt_mode_hint">
-                    حالت فعلی: رمزگشایی یک فایل .SAFE
-                  </p>
+                  <button class="option-item option-item--secondary">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Referral link</span>
+                      <span class="option-item__hint">
+                        Share your personal invite link and receive bonus coins.
+                      </span>
+                    </div>
+                  </button>
+                  <button class="option-item option-item--ghost">
+                    <div class="option-item__main">
+                      <span class="option-item__label">Transfer coins</span>
+                      <span class="option-item__hint">
+                        Send coins to another verified SAFE user (with limits).
+                      </span>
+                    </div>
+                  </button>
                 </div>
               </div>
             </article>
-          </div>
-
-          <section class="progress-section" aria-live="polite">
-            <header class="progress-header">
-              <h4 class="progress-title" data-i18n="decrypt_progress_title">وضعیت رمزگشایی</h4>
-            </header>
-            <div class="progress-bar">
-              <div class="progress-bar__fill" id="decryptProgressBar"></div>
-            </div>
-            <p class="progress-status" id="decryptProgressStatus" data-i18n="decrypt_progress_status">
-              در انتظار شروع عملیات...
-            </p>
           </section>
+
+          <!-- Section: Support & rules -->
+          <section class="panel-section" id="section-support">
+            <header class="panel-section__header">
+              <h2 class="panel-section__title">Support & rules</h2>
+              <p class="panel-section__subtitle">
+                Read the main rules, privacy notes and contact the SAFE team for help.
+              </p>
+            </header>
+
+            <article class="panel-card panel-card--wide">
+              <div class="panel-card__body panel-card__body--stack">
+                <div class="text-block">
+                  <h3 class="text-block__title">Usage rules</h3>
+                  <p class="text-block__body">
+                    SAFE is designed as a security-focused tool. Please do not use it to
+                    store or share illegal content, and never share your password or key
+                    with anyone. No plaintext files or keys are stored on the server side.
+                  </p>
+                </div>
+
+                <div class="text-block">
+                  <h3 class="text-block__title">Privacy</h3>
+                  <p class="text-block__body">
+                    The system only keeps minimal metadata necessary for accounting:
+                    user ID, file size, timestamps, status and accounting information.
+                    The content of your files and your passwords never leave your device.
+                  </p>
+                </div>
+
+                <div class="text-block">
+                  <h3 class="text-block__title">Contact support</h3>
+                  <p class="text-block__body">
+                    If something does not work as expected, you can contact the team via
+                    the SAFE support channel or by opening a ticket directly from the bot.
+                  </p>
+                  <div class="support-actions">
+                    <button class="btn btn--primary btn--sm">Open support chat</button>
+                    <button class="btn btn--ghost btn--sm">View FAQ</button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
+
         </section>
-      </section>
+      </div>
     </main>
 
-    <!-- Footer -->
     <footer class="app-footer">
-      <p class="app-footer__line" data-i18n="footer_line1">
-        SAFE – E2Ebox © 2025
-      </p>
-      <p class="app-footer__line app-footer__line--muted" data-i18n="footer_line2">
-        تمام پردازش‌ها فقط روی دستگاه شما انجام می‌شود؛ بدون ذخیرهٔ فایل خام یا کلید روی سرور.
-      </p>
+      <span>SAFE – E2Ebox © 2025</span>
+      <span class="app-footer__hint">
+        All cryptographic operations will run only on your device in the final version.
+      </span>
     </footer>
   </div>
 
-  <!-- Placeholder for future logic (do not implement in this task) -->
-  <script src="script.js" defer></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="script.js" defer></script>
+
 </body>
 </html>
