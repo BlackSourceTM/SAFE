@@ -1,11 +1,40 @@
 (function(w,d){
-function $(s,r){return(r||d).querySelector(s)}
-function $$(s,r){return Array.from((r||d).querySelectorAll(s))}
-function evaluatePassword(p){var lengthOK=p.length>=8;var digitOK=/\d/.test(p);var lowerOK=/[a-z]/.test(p);var upperOK=/[A-Z]/.test(p);var lowerUpperOK=lowerOK&&upperOK;var symbolOK=/[^A-Za-z0-9]/.test(p);var asciiOK=/^[\x20-\x7E]+$/.test(p);var score=0;if(lengthOK)score++;if(digitOK)score++;if(lowerUpperOK)score++;if(symbolOK)score++;if(asciiOK)score++;if(p.length>=12)score++;var level="weak";if(score>=5)level="robust";else if(score>=4)level="strong";else if(score>=3)level="medium";return{level:level,rules:{lengthOK:lengthOK,digitOK:digitOK,lowerUpperOK:lowerUpperOK,symbolOK:symbolOK,asciiOK:asciiOK}}}
-function generateStrongPassword(){var length=20;var digits="0123456789";var lowers="abcdefghijklmnopqrstuvwxyz";var uppers="ABCDEFGHIJKLMNOPQRSTUVWXYZ";var symbols="!@#$%^&*()-_=+[]{};:,.<>?";var password="";password+=digits[Math.floor(Math.random()*digits.length)];password+=lowers[Math.floor(Math.random()*lowers.length)];password+=uppers[Math.floor(Math.random()*uppers.length)];password+=symbols[Math.floor(Math.random()*symbols.length)];var all=digits+lowers+uppers+symbols;while(password.length<length)password+=all[Math.floor(Math.random()*all.length)];var a=password.split("");for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a.join("")}
-function attachPeekBehavior(btn,input){if(!btn||!input)return;function show(){input.type="text"}function hide(){input.type="password"}["mousedown","touchstart"].forEach(function(ev){btn.addEventListener(ev,function(e){e.preventDefault();show()})});["mouseup","mouseleave","touchend","touchcancel","blur"].forEach(function(ev){btn.addEventListener(ev,function(){hide()})})}
-function setupDropzone(opts){var root=opts.root;var acceptSafeOnly=!!opts.acceptSafeOnly;var onFileSelected=opts.onFileSelected;var dropzone=$(".dropzone",root);var filenameEl=$(".dropzone__filename",root);if(!dropzone||!filenameEl)return;var input=d.createElement("input");input.type="file";input.style.display="none";if(acceptSafeOnly)input.accept=".safe,.SAFE";d.body.appendChild(input);function handleFiles(files){if(!files||!files.length)return;var file=files[0];if(acceptSafeOnly&&!/\.safe$/i.test(file.name)){alert("لطفاً فقط فایل با پسوند .SAFE انتخاب کنید.");return}filenameEl.textContent=file.name;if(typeof onFileSelected==="function")onFileSelected(file)}dropzone.addEventListener("click",function(){input.click()});input.addEventListener("change",function(){handleFiles(input.files)});dropzone.addEventListener("dragover",function(e){e.preventDefault();dropzone.classList.add("is-dragover")});dropzone.addEventListener("dragleave",function(e){e.preventDefault();dropzone.classList.remove("is-dragover")});dropzone.addEventListener("drop",function(e){e.preventDefault();dropzone.classList.remove("is-dragover");if(e.dataTransfer&&e.dataTransfer.files)handleFiles(e.dataTransfer.files)});dropzone.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();input.click()}})}
-function createCaptchaManager(container){if(!container)return null;var displayTextEl=$(".captcha-display__text",container);var inputEl=$("input[id$='CaptchaInput']",container);var refreshBtn=$(".icon-btn--refresh",container);var botTrap=$(".bot-trap",container);if(!displayTextEl||!inputEl||!refreshBtn)return null;var currentValue="";function randomCaptcha(len){len=len||5;var chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";var out="";for(var i=0;i<len;i++)out+=chars[Math.floor(Math.random()*chars.length)];return out}function generate(){currentValue=randomCaptcha();displayTextEl.textContent=currentValue;inputEl.value=""}function validate(){if(botTrap&&botTrap.value.trim()!=="")return{ok:false,reason:"bot"};var v=inputEl.value.trim();if(!v)return{ok:false,reason:"empty"};if(v.toLowerCase()!==currentValue.toLowerCase())return{ok:false,reason:"mismatch"};return{ok:true}}refreshBtn.addEventListener("click",function(e){e.preventDefault();generate()});generate();return{validate:validate,regenerate:generate}}
-function stripExtension(name){if(!name)return"";var i=name.lastIndexOf(".");if(i<=0)return name;return name.slice(0,i)}
-w.SAFE_UI={$: $, $$: $$,evaluatePassword:evaluatePassword,generateStrongPassword:generateStrongPassword,attachPeekBehavior:attachPeekBehavior,setupDropzone:setupDropzone,createCaptchaManager:createCaptchaManager,stripExtension:stripExtension};
+function q(s,r){return(r||d).querySelector(s)}
+function ce(t,c){var e=d.createElement(t);if(c)e.className=c;return e}
+var modalEl=null,toastTimer=null;
+function ensureModalRoot(){
+  if(modalEl)return modalEl;
+  modalEl=ce("div","safe-modal-root");
+  modalEl.innerHTML="<div class=\"safe-modal-backdrop\"></div><div class=\"safe-modal\"><div class=\"safe-modal__inner\"></div></div>";
+  d.body.appendChild(modalEl);
+  modalEl.addEventListener("click",function(e){
+    if(e.target.classList.contains("safe-modal-backdrop"))closeModal();
+  });
+  return modalEl;
+}
+function showModal(title,bodyHtml,footerHtml){
+  var root=ensureModalRoot();
+  var inner=q(".safe-modal__inner",root);
+  inner.innerHTML="<div class=\"safe-modal__header\"><h2 class=\"safe-modal__title\"></h2><button class=\"safe-modal__close\" type=\"button\">×</button></div><div class=\"safe-modal__body\"></div><div class=\"safe-modal__footer\"></div>";
+  q(".safe-modal__title",inner).textContent=title||"";
+  q(".safe-modal__body",inner).innerHTML=bodyHtml||"";
+  q(".safe-modal__footer",inner).innerHTML=footerHtml||"";
+  q(".safe-modal__close",inner).addEventListener("click",closeModal);
+  root.classList.add("safe-modal-root--visible");
+  return inner;
+}
+function closeModal(){
+  if(!modalEl)return;
+  modalEl.classList.remove("safe-modal-root--visible");
+}
+function showToast(msg,type){
+  var ex=q(".safe-toast",d.body);
+  if(!ex){ex=ce("div","safe-toast");d.body.appendChild(ex);}
+  ex.textContent=msg||"";
+  ex.className="safe-toast safe-toast--"+(type||"info");
+  ex.classList.add("safe-toast--visible");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ex.classList.remove("safe-toast--visible")},2600);
+}
+w.SAFE_UI_CORE={showModal:showModal,closeModal:closeModal,showToast:showToast};
 })(window,document);
