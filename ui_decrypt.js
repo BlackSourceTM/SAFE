@@ -1,5 +1,59 @@
 (function(w,d){
-var U=w.SAFE_UI,C=w.SAFE_CRYPTO;
-function init(){if(!U||!C)return;var flow=d.getElementById("decryptFlow");if(!flow)return;var selectedFile=null;var dropRoot=flow.querySelector(".card--file");U.setupDropzone({root:dropRoot,acceptSafeOnly:true,onFileSelected:function(f){selectedFile=f}});var passwordInput=d.getElementById("decryptPassword");var eyeBtn=flow.querySelector(".form--decrypt .icon-btn--eye");U.attachPeekBehavior(eyeBtn,passwordInput);var captchaGroup=flow.querySelector(".form--decrypt .field-group--captcha");var captchaManager=U.createCaptchaManager(captchaGroup);var startBtn=flow.querySelector(".flow-actions .btn--primary");var statusCard=flow.querySelector(".status-card");var progressEl=statusCard?statusCard.querySelector(".progress"):null;var progressFill=statusCard?statusCard.querySelector(".progress__fill"):null;var statusText=statusCard?statusCard.querySelector(".status-card__text"):null;var statusBadge=statusCard?statusCard.querySelector(".status-card__badge"):null;function setProgress(p,t){if(progressFill)progressFill.style.width=p+"%";if(progressEl)progressEl.setAttribute("aria-valuenow",String(p));if(statusText&&t)statusText.textContent=t;if(statusBadge)statusBadge.textContent=p>=100?"انجام شد":"در حال پردازش"}function handleStart(){if(!selectedFile){alert("لطفاً ابتدا فایل SAFE را انتخاب کنید.");return}var password=passwordInput.value.trim();if(!password){alert("لطفاً رمز عبور را وارد کنید.");return}if(captchaManager){var c=captchaManager.validate();if(!c.ok){if(c.reason==="bot")alert("درخواست مشکوک به فعالیت رباتی است.");else if(c.reason==="empty")alert("لطفاً متن کپچا را وارد کنید.");else{alert("کپچا اشتباه است. لطفاً دوباره تلاش کنید.");captchaManager.regenerate()}return}}startBtn.disabled=true;setProgress(0,"در صف رمزگشایی...");C.decryptSafeFile(selectedFile,password,function(p,t){setProgress(p,t)}).then(function(res){var buf=res.buffer,meta=res.metadata;var type=(meta&&meta.type)||"application/octet-stream";var name=(meta&&meta.name)||selectedFile.name||"file";var blob=new Blob([buf],{type:type});var url=URL.createObjectURL(blob);var a=d.createElement("a");a.href=url;a.download=name;d.body.appendChild(a);a.click();setTimeout(function(){d.body.removeChild(a);URL.revokeObjectURL(url)},0);alert("فایل با موفقیت رمزگشایی و برای دانلود آماده شد.");}).catch(function(err){console.error(err);alert(err&&err.message?err.message:"خطایی در فرآیند رمزگشایی رخ داد. لطفاً رمز یا فایل را بررسی کنید.");}).finally(function(){startBtn.disabled=false})}if(startBtn)startBtn.addEventListener("click",function(e){e.preventDefault();handleStart()})}
-w.SAFE_DECRYPT_UI={init:init};
+var L=w.SAFE_I18N||{},core=w.SAFE_UI_CORE,crypto=w.SAFE_CRYPTO;
+if(!core||!crypto)return;
+function q(s,r){return(r||d).querySelector(s)}
+function setup(){
+  var sec=q("#section-crypto");
+  if(!sec)return;
+  var decBtn=q("#section-crypto .panel-card:nth-of-type(2) .option-item:nth-of-type(1)");
+  if(decBtn)decBtn.addEventListener("click",openDecryptModal);
+}
+function openDecryptModal(){
+  var body="<div class=\"safe-field\"><label class=\"safe-field__label\">"+(L.field_file_label||"File")+"</label><input class=\"safe-field__input\" type=\"file\" id=\"safe-dec-file\" accept=\".SAFE,.safe\"></div>";
+  body+="<div class=\"safe-field\"><label class=\"safe-field__label\">"+(L.field_password_label||"Password")+"</label><input class=\"safe-field__input\" type=\"password\" id=\"safe-dec-pwd\"></div>";
+  body+="<div class=\"safe-field__error\" id=\"safe-dec-error\"></div>";
+  body+="<div class=\"safe-progress\"><div class=\"safe-progress__bar\" id=\"safe-dec-progress\"></div></div>";
+  body+="<div class=\"safe-modal__status\" id=\"safe-dec-status\">"+(L.status_ready||"Ready")+"</div>";
+  var footer="<button type=\"button\" class=\"btn btn--ghost btn--sm\" id=\"safe-dec-cancel\">"+(L.btn_cancel||"Cancel")+"</button><button type=\"button\" class=\"btn btn--primary btn--sm\" id=\"safe-dec-start\" disabled>"+(L.btn_start||"Start")+"</button>";
+  var modalInner=core.showModal(L.modal_decrypt_title||"New decryption",body,footer);
+  var fileIn=q("#safe-dec-file",modalInner),pwd=q("#safe-dec-pwd",modalInner),err=q("#safe-dec-error",modalInner),btn=q("#safe-dec-start",modalInner),cancel=q("#safe-dec-cancel",modalInner),bar=q("#safe-dec-progress",modalInner),status=q("#safe-dec-status",modalInner);
+  function validate(){
+    err.textContent="";
+    var f=fileIn.files[0];
+    if(!f){btn.disabled=!0;return}
+    var p=pwd.value||"";
+    if(p.length<1){btn.disabled=!0;return}
+    btn.disabled=!1;
+  }
+  fileIn.addEventListener("change",validate);
+  pwd.addEventListener("input",validate);
+  cancel.addEventListener("click",core.closeModal);
+  btn.addEventListener("click",function(){
+    err.textContent="";
+    btn.disabled=!0;cancel.disabled=!0;fileIn.disabled=!0;pwd.disabled=!0;
+    status.textContent=L.status_working||"Working...";
+    var f=fileIn.files[0],p=pwd.value;
+    crypto.decryptFile(f,p,function(progress){
+      bar.style.width=Math.round(progress*100)+"%";
+    }).then(function(res){
+      status.textContent=L.status_done||"Done";
+      bar.style.width="100%";
+      core.showToast(L.toast_decrypt_success||"File decrypted successfully.","success");
+      var a=d.createElement("a");
+      a.href=URL.createObjectURL(res.blob);
+      a.download=res.name||"file";
+      d.body.appendChild(a);
+      a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},100);
+      core.closeModal();
+    }).catch(function(e){
+      console.error(e);
+      err.textContent=L.toast_operation_failed||"Operation failed. Please check password and file.";
+      status.textContent=L.status_error||"Error";
+      core.showToast(L.toast_operation_failed||"Operation failed. Please check password and file.","error");
+      btn.disabled=!1;cancel.disabled=!1;fileIn.disabled=!1;pwd.disabled=!1;
+    });
+  });
+}
+if(d.readyState==="loading")d.addEventListener("DOMContentLoaded",setup);else setup();
 })(window,document);
