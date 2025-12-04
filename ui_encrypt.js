@@ -1,5 +1,62 @@
 (function(w,d){
-var U=w.SAFE_UI,C=w.SAFE_CRYPTO;
-function init(){if(!U||!C)return;var flow=d.getElementById("encryptFlow");if(!flow)return;var selectedFile=null;var dropRoot=flow.querySelector(".card--file");U.setupDropzone({root:dropRoot,acceptSafeOnly:false,onFileSelected:function(f){selectedFile=f}});var passwordInput=d.getElementById("encryptPassword");var passwordConfirmWrapper=flow.querySelector(".confirm-password");var passwordConfirmInput=d.getElementById("encryptPasswordConfirm");var confirmToggleBtn=flow.querySelector(".form--encrypt .btn--ghost");var eyeMain=flow.querySelector(".form--encrypt .icon-btn--eye");var generateBtn=flow.querySelector(".icon-btn--generate");var eyeConfirm=passwordConfirmWrapper?passwordConfirmWrapper.querySelector(".icon-btn--eye"):null;var strengthFill=flow.querySelector(".password-strength__fill");var strengthLabel=flow.querySelector(".password-strength__label");var rulesList=flow.querySelector(".password-rules");var captchaGroup=flow.querySelector(".form--encrypt .field-group--captcha");var captchaManager=U.createCaptchaManager(captchaGroup);var startBtn=flow.querySelector(".flow-actions .btn--primary");var statusCard=flow.querySelector(".status-card");var progressEl=statusCard?statusCard.querySelector(".progress"):null;var progressFill=statusCard?statusCard.querySelector(".progress__fill"):null;var statusText=statusCard?statusCard.querySelector(".status-card__text"):null;var statusBadge=statusCard?statusCard.querySelector(".status-card__badge"):null;U.attachPeekBehavior(eyeMain,passwordInput);U.attachPeekBehavior(eyeConfirm,passwordConfirmInput);if(generateBtn)generateBtn.addEventListener("click",function(e){e.preventDefault();var pwd=U.generateStrongPassword();passwordInput.value=pwd;updateStrength(pwd)});function updateStrength(p){if(!strengthFill||!strengthLabel||!rulesList)return;var res=U.evaluatePassword(p);var level=res.level;var rules=res.rules;strengthFill.style.width=level==="weak"?"25%":level==="medium"?"50%":level==="strong"?"75%":"100%";strengthFill.className="password-strength__fill";strengthFill.classList.add("password-strength__fill--"+level);var lang=d.documentElement.lang||"fa";var txt="";if(lang==="fa"){if(level==="weak")txt="قدرت رمز ضعیف است. لطفاً رمز قوی‌تری انتخاب کنید.";else if(level==="medium")txt="قدرت رمز متوسط است؛ بهتر است رمز را کمی قوی‌تر کنید.";else if(level==="strong")txt="قدرت رمز خوب و قابل قبول است.";else txt="قدرت رمز بسیار عالی و پایدار است.";}else{if(level==="weak")txt="Password is weak. Please choose a stronger one.";else if(level==="medium")txt="Password is medium. It is better to strengthen it.";else if(level==="strong")txt="Password strength is good and acceptable.";else txt="Password is very strong and robust.";}strengthLabel.textContent=txt;var items=rulesList.querySelectorAll(".password-rule");for(var i=0;i<items.length;i++){var li=items[i];var k=li.getAttribute("data-i18n")||"";var ok=false;if(k==="password_rule_length")ok=rules.lengthOK;else if(k==="password_rule_digit")ok=rules.digitOK;else if(k==="password_rule_case")ok=rules.lowerUpperOK;else if(k==="password_rule_special")ok=rules.symbolOK;else if(k==="password_rule_ascii")ok=rules.asciiOK;li.classList.toggle("password-rule--ok",ok)}}if(passwordInput)passwordInput.addEventListener("input",function(){updateStrength(passwordInput.value)});if(passwordInput)passwordInput.addEventListener("keydown",function(e){if(e.key==="Enter"&&confirmToggleBtn){e.preventDefault();confirmToggleBtn.click()}});if(confirmToggleBtn&&passwordConfirmWrapper)confirmToggleBtn.addEventListener("click",function(e){e.preventDefault();var vis=passwordConfirmWrapper.classList.toggle("is-visible");if(vis&&passwordConfirmInput)passwordConfirmInput.focus()});if(passwordConfirmInput)passwordConfirmInput.addEventListener("input",function(){var ok=passwordInput.value.length>0&&passwordInput.value===passwordConfirmInput.value;passwordConfirmInput.dataset.match=ok?"true":"false"});function setProgress(p,t){if(progressFill)progressFill.style.width=p+"%";if(progressEl)progressEl.setAttribute("aria-valuenow",String(p));if(statusText&&t)statusText.textContent=t;if(statusBadge)statusBadge.textContent=p>=100?"انجام شد":"در حال پردازش"}function handleStart(){if(!selectedFile){alert("لطفاً ابتدا یک فایل برای رمزنگاری انتخاب کنید.");return}var password=passwordInput.value.trim();if(!password){alert("رمز عبور نباید خالی باشد.");return}var res=U.evaluatePassword(password);if(res.level==="weak"||res.level==="medium"){alert("قدرت رمز عبور باید حداقل «قوی» باشد.");return}if(!passwordConfirmWrapper.classList.contains("is-visible")){alert("ابتدا رمز عبور را در مرحله بعد تأیید کنید.");return}if(passwordConfirmInput.value!==password){alert("رمز عبور و تکرار آن یکسان نیست.");return}if(captchaManager){var c=captchaManager.validate();if(!c.ok){if(c.reason==="bot")alert("درخواست مشکوک به فعالیت رباتی است.");else if(c.reason==="empty")alert("لطفاً متن کپچا را وارد کنید.");else{alert("کپچا اشتباه است. لطفاً دوباره تلاش کنید.");captchaManager.regenerate()}return}}startBtn.disabled=true;setProgress(0,"در صف رمزنگاری...");C.encryptFileToSafe(selectedFile,password,function(p,t){setProgress(p,t)}).then(function(res){var buf=res.buffer,meta=res.metadata;var blob=new Blob([buf],{type:"application/octet-stream"});var name=(meta&&meta.name)||selectedFile.name||"file";var base=U.stripExtension(name)||name;var safeName=base+".SAFE";var url=URL.createObjectURL(blob);var a=d.createElement("a");a.href=url;a.download=safeName;d.body.appendChild(a);a.click();setTimeout(function(){d.body.removeChild(a);URL.revokeObjectURL(url)},0);alert("فایل با موفقیت رمزنگاری و برای دانلود آماده شد.");}).catch(function(err){console.error(err);alert(err&&err.message?err.message:"خطایی در فرآیند رمزنگاری رخ داد.");}).finally(function(){startBtn.disabled=false})}if(startBtn)startBtn.addEventListener("click",function(e){e.preventDefault();handleStart()})}
-w.SAFE_ENCRYPT_UI={init:init};
+var L=w.SAFE_I18N||{},core=w.SAFE_UI_CORE,crypto=w.SAFE_CRYPTO;
+if(!core||!crypto)return;
+function q(s,r){return(r||d).querySelector(s)}
+function setup(){
+  var sec=q("#section-crypto");
+  if(!sec)return;
+  var encBtn=q("#section-crypto .panel-card:nth-of-type(1) .option-item:nth-of-type(1)");
+  if(encBtn)encBtn.addEventListener("click",openEncryptModal);
+}
+function openEncryptModal(){
+  var body="<div class=\"safe-field\"><label class=\"safe-field__label\">"+(L.field_file_label||"File")+"</label><input class=\"safe-field__input\" type=\"file\" id=\"safe-enc-file\"></div>";
+  body+="<div class=\"safe-field\"><label class=\"safe-field__label\">"+(L.field_password_label||"Password")+"</label><input class=\"safe-field__input\" type=\"password\" id=\"safe-enc-pwd\"></div>";
+  body+="<div class=\"safe-field\"><label class=\"safe-field__label\">"+(L.field_password_confirm_label||"Repeat password")+"</label><input class=\"safe-field__input\" type=\"password\" id=\"safe-enc-pwd2\"></div>";
+  body+="<div class=\"safe-field__error\" id=\"safe-enc-error\"></div>";
+  body+="<div class=\"safe-progress\"><div class=\"safe-progress__bar\" id=\"safe-enc-progress\"></div></div>";
+  body+="<div class=\"safe-modal__status\" id=\"safe-enc-status\">"+(L.status_ready||"Ready")+"</div>";
+  var footer="<button type=\"button\" class=\"btn btn--ghost btn--sm\" id=\"safe-enc-cancel\">"+(L.btn_cancel||"Cancel")+"</button><button type=\"button\" class=\"btn btn--primary btn--sm\" id=\"safe-enc-start\" disabled>"+(L.btn_start||"Start")+"</button>";
+  var modalInner=core.showModal(L.modal_encrypt_title||"New encryption",body,footer);
+  var fileIn=q("#safe-enc-file",modalInner),pwd=q("#safe-enc-pwd",modalInner),pwd2=q("#safe-enc-pwd2",modalInner),err=q("#safe-enc-error",modalInner),btn=q("#safe-enc-start",modalInner),cancel=q("#safe-enc-cancel",modalInner),bar=q("#safe-enc-progress",modalInner),status=q("#safe-enc-status",modalInner);
+  function validate(){
+    err.textContent="";
+    var f=fileIn.files[0];
+    if(!f){btn.disabled=!0;return}
+    var p=pwd.value||"",p2=pwd2.value||"";
+    if(p.length<8){btn.disabled=!0;err.textContent=L.validation_pwd_short||"Password must be at least 8 characters.";return}
+    if(p!==p2){btn.disabled=!0;err.textContent=L.validation_pwd_mismatch||"Passwords do not match.";return}
+    btn.disabled=!1;
+  }
+  fileIn.addEventListener("change",validate);
+  pwd.addEventListener("input",validate);
+  pwd2.addEventListener("input",validate);
+  cancel.addEventListener("click",core.closeModal);
+  btn.addEventListener("click",function(){
+    err.textContent="";
+    btn.disabled=!0;cancel.disabled=!0;fileIn.disabled=!0;pwd.disabled=!0;pwd2.disabled=!0;
+    status.textContent=L.status_working||"Working...";
+    var f=fileIn.files[0],p=pwd.value;
+    crypto.encryptFile(f,p,function(progress){
+      bar.style.width=Math.round(progress*100)+"%";
+    }).then(function(res){
+      status.textContent=L.status_done||"Done";
+      bar.style.width="100%";
+      core.showToast(L.toast_encrypt_success||"File encrypted successfully.","success");
+      var a=d.createElement("a");
+      a.href=URL.createObjectURL(res.blob);
+      a.download=res.name;
+      d.body.appendChild(a);
+      a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},100);
+      core.closeModal();
+    }).catch(function(e){
+      console.error(e);
+      err.textContent=L.toast_operation_failed||"Operation failed. Please check password and file.";
+      status.textContent=L.status_error||"Error";
+      core.showToast(L.toast_operation_failed||"Operation failed. Please check password and file.","error");
+      btn.disabled=!1;cancel.disabled=!1;fileIn.disabled=!1;pwd.disabled=!1;pwd2.disabled=!1;
+    });
+  });
+}
+if(d.readyState==="loading")d.addEventListener("DOMContentLoaded",setup);else setup();
 })(window,document);
