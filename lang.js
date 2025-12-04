@@ -1,68 +1,22 @@
-(function(w,d){
-var current="fa",bootstrapped=false;
-var dict={fa:{},en:{
-app_title:"SAFE – E2Ebox | Mini App",
-brand_subtitle:"End-to-end file encryption only on your device",
-brand_title:"SAFE – E2Ebox",
-captcha_label:"Captcha for anti-bot",
-captcha_refresh:"Reload captcha",
-decrypt_drop_filename:"No SAFE file selected yet.",
-decrypt_drop_help:"Click or drop a SAFE file here.",
-decrypt_mode_caption:"Current mode: Decrypt a SAFE file",
-decrypt_password_hint:"Use the same password you used when encrypting this SAFE file.",
-decrypt_password_label:"Password for decryption",
-decrypt_primary_button:"Start decrypting file",
-decrypt_step1_subtitle:"Select the SAFE file you want to decrypt.",
-decrypt_step1_title:"1. Select SAFE file",
-decrypt_step2_subtitle:"Enter your password and solve the captcha to continue.",
-decrypt_step2_title:"2. Enter password and captcha",
-encrypt_confirm_toggle:"Next step (confirm password)",
-encrypt_drop_filename:"No file selected yet.",
-encrypt_drop_help:"Click to choose a file or drag and drop it here.",
-encrypt_mode_caption:"Current mode: Encrypt file with AES-256-GCM",
-encrypt_password_confirm_hint:"Re-enter the password to avoid mistakes.",
-encrypt_password_confirm_label:"Repeat password",
-encrypt_password_hint:"Minimum 8 characters. Use English letters, digits and symbols.",
-encrypt_password_label:"Main password",
-encrypt_password_strength_label:"Password strength has not been evaluated yet.",
-encrypt_primary_button:"Start encrypting file",
-encrypt_step1_subtitle:"Select the file you want to encrypt or drag it here.",
-encrypt_step1_title:"1. Select file",
-encrypt_step2_subtitle:"Choose a strong password. It is never sent to the server.",
-encrypt_step2_title:"2. Set password and captcha",
-footer_line1:"SAFE – E2Ebox © 2025",
-footer_line2:"All processing happens only on your device; no raw file or key is stored on the server.",
-hero_hint:"This UI runs only in your browser. Cryptography and Telegram integration will be wired to this interface.",
-hero_subtitle:"SAFE – E2Ebox is a Telegram Mini App that encrypts and decrypts your files locally using Web Crypto API.",
-hero_title:"Mini App SAFE – real encryption on your device",
-lang_toggle:"EN / FA",
-mode_decrypt:"Decrypt file (Decrypt)",
-mode_encrypt:"Encrypt file (Encrypt)",
-password_rule_ascii:"Only English letters and digits (no Persian or other alphabets)",
-password_rule_case:"Mix of lowercase and uppercase Latin letters",
-password_rule_digit:"At least one digit",
-password_rule_length:"At least 8 characters",
-password_rule_special:"At least one special character (!@#$%^&* etc.)",
-password_rules_title:"Recommended password rules:",
-status_decrypt_badge:"Ready",
-status_decrypt_step_decrypt_stream:"Decrypting encrypted file stream",
-status_decrypt_step_finalize:"Rebuilding original file and preparing download",
-status_decrypt_step_open_safe:"Reading and validating SAFE header",
-status_decrypt_step_prepare_key:"Deriving key from password",
-status_decrypt_text:"No decryption has started yet.",
-status_decrypt_title:"Decryption status",
-status_encrypt_badge:"Ready",
-status_encrypt_text:"No encryption has started yet.",
-status_encrypt_title:"Encryption status",
-status_step_encrypt_stream:"Encrypting file stream with AES-256-GCM",
-status_step_finalize:"Building final SAFE file (header + data)",
-status_step_prepare_key:"Deriving key and building SAFE header",
-status_step_write_safe:"Writing SAFE file and preparing download"
+(function(w){
+w.SAFE_LANG={en:{
+  modal_encrypt_title:"New encryption",
+  modal_decrypt_title:"New decryption",
+  field_file_label:"File",
+  field_password_label:"Password",
+  field_password_confirm_label:"Repeat password",
+  btn_start:"Start",
+  btn_cancel:"Cancel",
+  status_ready:"Ready",
+  status_working:"Working...",
+  status_done:"Done",
+  status_error:"Error",
+  validation_file_required:"Please select a file.",
+  validation_pwd_short:"Password must be at least 8 characters.",
+  validation_pwd_mismatch:"Passwords do not match.",
+  toast_encrypt_success:"File encrypted successfully.",
+  toast_decrypt_success:"File decrypted successfully.",
+  toast_operation_failed:"Operation failed. Please check password and file."
 }};
-function bootstrapFa(){if(bootstrapped)return;bootstrapped=true;var els=d.querySelectorAll("[data-i18n]");for(var i=0;i<els.length;i++){var el=els[i];var k=el.getAttribute("data-i18n");if(!k)continue;if(!dict.fa[k])dict.fa[k]=el.textContent.trim();}}
-function apply(lang){bootstrapFa();current=lang;d.documentElement.lang=lang;d.documentElement.dir=lang==="fa"?"rtl":"ltr";var els=d.querySelectorAll("[data-i18n]");for(var i=0;i<els.length;i++){var el=els[i];var k=el.getAttribute("data-i18n");if(!k)continue;var t=(dict[lang]&&dict[lang][k])||dict.fa[k]||"";var tag=el.tagName;if(tag==="INPUT"||tag==="TEXTAREA")el.placeholder=t;else el.textContent=t;}var btn=d.querySelector(".lang-toggle");if(btn)btn.textContent=lang==="fa"?"EN / FA":"FA / EN";}
-function setLang(lang){if(lang!=="fa"&&lang!=="en")lang="fa";apply(lang);try{localStorage.setItem("safe-lang",lang);}catch(e){}}
-function toggle(){setLang(current==="fa"?"en":"fa")}
-function init(){var saved=null;try{saved=localStorage.getItem("safe-lang");}catch(e){}setLang(saved==="en"?"en":"fa");var btn=d.querySelector(".lang-toggle");if(btn)btn.addEventListener("click",toggle);}
-w.SAFE_LANG={init:init,setLang:setLang,getLang:function(){return current},dict:dict};
-})(window,document);
+w.SAFE_I18N=w.SAFE_LANG.en;
+})(window);
