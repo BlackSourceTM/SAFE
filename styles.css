@@ -474,12 +474,17 @@ body{
   color:var(--text-muted);
   cursor:pointer;
   padding:0 4px;
-  font-size:13px;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-.safe-field__icon-btn--gen{right:28px}
+.safe-field__icon-btn i{
+  pointer-events:none;
+}
+.safe-field__icon-btn--gen{right:28px;}
 .safe-field__icon-btn--eye,
-.safe-field__icon-btn--eyehold{right:6px}
-
+.safe-field__icon-btn--eyehold{right:6px;}
 .safe-password-rules{
   margin:4px 0 0;
   padding-left:18px;
