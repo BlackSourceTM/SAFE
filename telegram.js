@@ -1,11 +1,119 @@
-(function(w,d){
-function getQuery(k){var s=w.location.search.slice(1).split("&");for(var i=0;i<s.length;i++){var p=s[i].split("=");if(p[0]===k)return decodeURIComponent(p[1]||"");}return""}
-var devMode=getQuery("dev")==="1"||w.location.hash.indexOf("#dev")!==-1;
-var WA;
-function overlay(msg){var o=d.createElement("div");o.style.position="fixed";o.style.inset="0";o.style.zIndex="9999";o.style.display="flex";o.style.alignItems="center";o.style.justifyContent="center";o.style.backdropFilter="blur(12px)";o.style.background="rgba(0,0,0,.8)";var b=d.createElement("div");b.style.maxWidth="420px";b.style.margin="16px";b.style.borderRadius="20px";b.style.padding="24px";b.style.background="#111827";b.style.color="#e5e7eb";b.style.fontFamily="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif";b.style.textAlign="center";b.style.boxShadow="0 24px 60px rgba(0,0,0,.75)";var h=d.createElement("h2");h.textContent="SAFE – E2Ebox";h.style.fontSize="20px";h.style.margin="0 0 8px";var p=d.createElement("p");p.textContent=msg;p.style.fontSize="14px";p.style.lineHeight="1.6";p.style.margin="0";b.appendChild(h);b.appendChild(p);if(devMode){var btn=d.createElement("button");btn.textContent="ورود به حالت توسعه (خارج از تلگرام)";btn.style.marginTop="14px";btn.style.padding="9px 16px";btn.style.borderRadius="999px";btn.style.border="none";btn.style.fontSize="13px";btn.style.cursor="pointer";btn.style.background="#22c55e";btn.style.color="#022c22";btn.addEventListener("click",function(){o.remove()});b.appendChild(btn)}o.appendChild(b);d.body.appendChild(o)}
-function applyTheme(root,wa){var tp=wa.themeParams||{};function s(k,c){if(tp[k])root.style.setProperty(c,tp[k])}
-s("bg_color","--tg-bg-color");s("text_color","--tg-text-color");s("hint_color","--tg-hint-color");s("link_color","--tg-link-color");s("button_color","--tg-button-color");s("button_text_color","--tg-button-text-color");s("secondary_bg_color","--tg-secondary-bg")}
-function init(){var root=d.documentElement;WA=w.Telegram&&w.Telegram.WebApp;if(!WA){overlay("این نسخه از SAFE فقط باید از داخل تلگرام و به عنوان Mini App باز شود.");return}try{WA.ready();WA.expand()}catch(e){}applyTheme(root,WA);var scheme=WA.colorScheme;if(scheme==="light"||scheme==="dark")root.setAttribute("data-theme",scheme)}
-w.SAFE_TG={init:init,isDev:function(){return devMode}};
-if(d.readyState==="loading")d.addEventListener("DOMContentLoaded",init);else init();
-})(window,document);
+// telegram.js
+(function () {
+  function safeQuery(selector) {
+    return document.querySelector(selector);
+  }
+
+  function getTelegramUser() {
+    if (!window.Telegram || !window.Telegram.WebApp) {
+      return null;
+    }
+    const wa = window.Telegram.WebApp;
+    if (!wa.initDataUnsafe || !wa.initDataUnsafe.user) {
+      return null;
+    }
+    return wa.initDataUnsafe.user;
+  }
+
+  function buildUserModel() {
+    const tgUser = getTelegramUser();
+    if (!tgUser) {
+      // حالت دمو وقتی خارج از تلگرام هستیم
+      return {
+        username: "demo_user",
+        userId: 22130261,
+        firstName: "SAFE",
+        lastName: "Demo",
+      };
+    }
+
+    const username =
+      (tgUser.username && String(tgUser.username)) ||
+      (tgUser.first_name ? tgUser.first_name : "user");
+    const userId = tgUser.id || 0;
+
+    return {
+      username,
+      userId,
+      firstName: tgUser.first_name || "",
+      lastName: tgUser.last_name || "",
+    };
+  }
+
+  function updateHeader(user) {
+    const headerNameEl = safeQuery(".user-pill__name");
+    const headerHintEl = safeQuery(".user-pill__hint");
+    const avatarEl = safeQuery(".user-pill__avatar");
+
+    if (headerNameEl) {
+      headerNameEl.textContent =
+        user.username.startsWith("@")
+          ? user.username
+          : "@" + user.username;
+    }
+
+    if (headerHintEl) {
+      // نمایش User ID عددی زیر نام
+      const idStr =
+        typeof user.userId === "number"
+          ? String(user.userId)
+          : String(user.userId || "00000000");
+      headerHintEl.textContent = idStr;
+    }
+
+    if (avatarEl) {
+      // اولین حرف نام یا یوزرنیم به‌عنوان آواتار
+      const base =
+        user.firstName ||
+        user.username ||
+        "S";
+      const ch = base.trim().charAt(0) || "S";
+      avatarEl.textContent = ch.toUpperCase();
+    }
+  }
+
+  function updateProfileSection(user) {
+    // پنل My profile: اولین ردیف «Telegram user ID» است
+    const profileSection = safeQuery("#section-profile");
+    if (!profileSection) return;
+
+    const rows = profileSection.querySelectorAll(".data-list__row");
+    if (!rows.length) return;
+
+    // ردیف اول: Telegram user ID
+    const idRow = rows[0];
+    const idDd = idRow.querySelector("dd");
+    if (idDd) {
+      const idStr =
+        typeof user.userId === "number"
+          ? String(user.userId)
+          : String(user.userId || "00000000");
+      idDd.textContent = idStr;
+    }
+
+    // می‌توانی بعداً اینجا چیزهای بیشتر مثل total operations و... را
+    // وقتی بک‌اند آماده شد، به‌روزرسانی کنی.
+  }
+
+  function initTelegramUI() {
+    const user = buildUserModel();
+    updateHeader(user);
+    updateProfileSection(user);
+
+    // اگر در تلگرام هستیم، WebApp را آماده کن
+    if (window.Telegram && window.Telegram.WebApp) {
+      try {
+        const wa = window.Telegram.WebApp;
+        wa.ready();
+      } catch (e) {
+        // در حالت دمو ممکن است خطا بدهد؛ نادیده می‌گیریم
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTelegramUI);
+  } else {
+    initTelegramUI();
+  }
+})();
