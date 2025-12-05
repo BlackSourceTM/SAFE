@@ -489,7 +489,105 @@ body{
 .safe-password-rules li.ok{
   color:var(--accent-strong);
 }
+/* input wrapper for icons (اگر قبلاً نداری) */
+.safe-field__input-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+.safe-field__input-wrap .safe-field__input{
+  padding-right:72px;
+}
 
+/* دکمه‌های آیکونی داخل اینپوت */
+.safe-field__icon-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  border:none;
+  background:transparent;
+  color:var(--text-muted);
+  cursor:pointer;
+  padding:0 4px;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.safe-field__icon-btn i{
+  pointer-events:none;
+}
+.safe-field__icon-btn--gen{right:28px;}
+.safe-field__icon-btn--eye,
+.safe-field__icon-btn--eyehold{right:6px;}
+
+/* قوانین رمز */
+.safe-password-rules{
+  margin:4px 0 0;
+  padding-left:18px;
+  font-size:11px;
+  color:var(--text-muted);
+}
+.safe-password-rules li.ok{
+  color:var(--accent-strong);
+}
+
+/* نوار قدرت رمز (اگر قبلاً تعریف نشده) */
+.safe-progress{
+  margin-top:6px;
+  height:3px;
+  border-radius:999px;
+  background:rgba(148,163,184,0.25);
+  overflow:hidden;
+}
+.safe-progress__bar{
+  height:100%;
+  width:0;
+  transition:width .2s ease,background .2s ease;
+}
+
+/* حالت خطا / موفق برای اینپوت تکرار رمز */
+.safe-field__input--error{
+  border-color:#ef4444 !important;
+}
+.safe-field__input--ok{
+  border-color:#22c55e !important;
+}
+
+/* استایل پاپ‌آپ Terms of use */
+.safe-popup-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1400;
+}
+.safe-popup{
+  background:var(--surface-raised, #050816);
+  border-radius:16px;
+  padding:16px 20px;
+  box-shadow:0 18px 40px rgba(0,0,0,.65);
+  max-width:320px;
+  width:90%;
+  text-align:center;
+}
+.safe-popup__title{
+  font-weight:600;
+  font-size:15px;
+  margin-bottom:6px;
+}
+.safe-popup__text{
+  font-size:13px;
+  color:var(--text-muted);
+  margin-bottom:14px;
+}
+.safe-popup__actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
 .option-item--danger .option-item__label{
   color:var(--danger);
 }
