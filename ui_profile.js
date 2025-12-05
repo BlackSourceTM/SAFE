@@ -34,7 +34,7 @@ var p3=document.createElement("p");p3.textContent="Do you still want to delete y
 bodyEl.appendChild(p1);bodyEl.appendChild(p2);bodyEl.appendChild(p3)
 footerEl.innerHTML=""
 var buttons=[
-{label:"Yes",variant:"btn--danger",action:"yes1"},
+{label:"Yes",variant:"btn--ghost",action:"yes1"},
 {label:"No",variant:"btn--ghost",action:"no"},
 {label:"Not sure",variant:"btn--ghost",action:"unsure"},
 {label:"Cancel",variant:"btn--ghost",action:"cancel"}
@@ -63,7 +63,7 @@ var p2=document.createElement("p");p2.textContent="This confirmation is required
 bodyEl.appendChild(p1);bodyEl.appendChild(p2)
 footerEl.innerHTML=""
 var buttons=[
-{label:"Yes, I am absolutely sure",variant:"btn--danger",action:"yes2"},
+{label:"Yes, I am absolutely sure",variant:"btn--ghost",action:"yes2"},
 {label:"No",variant:"btn--ghost",action:"no"},
 {label:"Yes",variant:"btn--ghost",action:"softyes"},
 {label:"I don't know",variant:"btn--ghost",action:"unsure"}
@@ -162,3 +162,4 @@ clone.addEventListener("click",function(){renderStep1(user)})
 }
 document.addEventListener("DOMContentLoaded",function(){initDeleteAccountFlow()})
 })();
+::contentReference[oaicite:0]{index=0}
