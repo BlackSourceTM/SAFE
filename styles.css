@@ -708,6 +708,18 @@ body{
   gap:8px;
   flex-wrap:wrap;
 }
+/* danger option in profile */
+.option-item--danger .option-item__label,
+.option-item--danger .option-item__hint{
+  color:#f97373;
+}
+.option-item--danger{
+  border-color:rgba(248,113,113,.5);
+}
+.option-item--danger:hover{
+  border-color:rgba(248,113,113,.9);
+  background:rgba(127,29,29,.35);
+}
 
 /* footer */
 .app-footer{
