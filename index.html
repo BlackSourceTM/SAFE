@@ -551,7 +551,7 @@
               </div>
             </article>
           </section>
-
+          <!-- Section: Support & rules -->
           <!-- Section: Support & rules -->
           <section class="panel-section" id="section-support">
             <header class="panel-section__header">
@@ -560,42 +560,25 @@
                 Read the main rules, privacy notes and contact the SAFE team for help.
               </p>
             </header>
-
             <article class="panel-card panel-card--wide">
-              <div class="panel-card__body panel-card__body--stack">
-                <div class="text-block">
-                  <h3 class="text-block__title">Usage rules</h3>
-                  <p class="text-block__body">
-                    SAFE is designed as a security-focused tool. Please do not use it to
-                    store or share illegal content, and never share your password or key
-                    with anyone. No plaintext files or keys are stored on the server side.
-                  </p>
+               <div class="panel-card__body panel-card__body--stack">
+                <!-- این باکس اسکرول‌دار قوانین است -->
+                <div class="support-rules-box">
+                  <pre id="support-rules-text" class="support-rules-text">
+          Loading SAFE rules…</pre>
                 </div>
-
-                <div class="text-block">
-                  <h3 class="text-block__title">Privacy</h3>
-                  <p class="text-block__body">
-                    The system only keeps minimal metadata necessary for accounting:
-                    user ID, file size, timestamps, status and accounting information.
-                    The content of your files and your passwords never leave your device.
-                  </p>
-                </div>
-
-                <div class="text-block">
-                  <h3 class="text-block__title">Contact support</h3>
-                  <p class="text-block__body">
-                    If something does not work as expected, you can contact the team via
-                    the SAFE support channel or by opening a ticket directly from the bot.
-                  </p>
-                  <div class="support-actions">
-                    <button class="btn btn--primary btn--sm">Open support chat</button>
-                    <button class="btn btn--ghost btn--sm">View FAQ</button>
-                  </div>
+                <!-- دکمه‌های پایین، مثل قبل -->
+                <div class="support-actions">
+                  <button class="btn btn--primary btn--sm" data-support="chat">
+                    Open support chat
+                  </button>
+                  <button class="btn btn--ghost btn--sm" data-support="faq">
+                     View FAQ
+                  </button>
                 </div>
               </div>
             </article>
           </section>
-
         </section>
       </div>
     </main>
