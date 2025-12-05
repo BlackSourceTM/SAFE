@@ -491,6 +491,12 @@ body{
   font-size:11px;
   color:var(--text-muted);
 }
+.safe-captcha-box{
+  margin-top:4px;
+}
+.safe-captcha-container{
+  display:inline-block;
+}
 .safe-password-rules li.ok{
   color:var(--accent-strong);
 }
