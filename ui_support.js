@@ -2,14 +2,14 @@
 function q(s,c){return(c||d).querySelector(s)}
 function loadText(target,path,fallback){
  if(!target)return;
- target.textContent="Loading…";
+ target.innerHTML="Loading…";
  fetch(path,{cache:"no-store"}).then(function(r){
   if(!r.ok)throw new Error("http");
   return r.text();
  }).then(function(t){
-  target.textContent=t;
+  target.innerHTML=t;
  }).catch(function(){
-  target.textContent=fallback||"Could not load this text. Please try again later.";
+  target.innerHTML=fallback||"Could not load this text. Please try again later.";
  });
 }
 function openChat(){
