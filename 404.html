@@ -201,6 +201,16 @@
     }
   </style>
 </head>
+<script>
+  // بررسی مسیر فعلی
+  const path = window.location.pathname;
+
+  // اگر فایل تصویری یا با پسوند مشخص وجود ندارد
+  if (path.match(/\.(png|jpg|jpeg|svg|gif)$/)) {
+    // ریدایرکت به index یا صفحه 404 سفارشی
+    window.location.replace('/404.html'); // یا '/'
+  }
+</script>
 <body>
   <header class="site-top" role="banner" aria-label="Site header">
     <div class="brand" aria-hidden="true">
@@ -377,3 +387,4 @@ if (!routes.has(path)) throw new NotFound();</pre>
   </script>
 </body>
 </html>
+
