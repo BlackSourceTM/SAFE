@@ -256,15 +256,16 @@
     cancelBtn.addEventListener("click", closeStoreModal);
     footerEl.appendChild(cancelBtn);
 
-    if (config.primaryLabel) {
+    // FIX: Always create primary button if onPrimary exists,
+    // even when primaryLabel is empty (it will be updated later).
+    var hasPrimary = typeof config.onPrimary === "function";
+    if (hasPrimary) {
       var primaryBtn = document.createElement("button");
       primaryBtn.type = "button";
       primaryBtn.className = "btn btn--primary btn--sm";
-      primaryBtn.innerHTML = config.primaryLabel;
+      primaryBtn.innerHTML = config.primaryLabel || "Continue";
       primaryBtn.addEventListener("click", function () {
-        if (typeof config.onPrimary === "function") {
-          config.onPrimary();
-        }
+        config.onPrimary();
       });
       footerEl.appendChild(primaryBtn);
     }
@@ -471,7 +472,8 @@
 
     openStoreModal({
       title: "Upgrade to " + planPricing.name,
-      primaryLabel: "", // set after render
+      // primaryLabel intentionally left empty; it will be updated by updatePlanPrimaryButton
+      primaryLabel: "",
       buildBody: function (body) {
         var id = planPricing.id;
         var maxMb = PLAN_LIMITS_MB[id] || null;
@@ -668,7 +670,7 @@
       var pricing = PLAN_PRICING[planInfo.id];
       if (!pricing) {
         showStoreToast(
-          "Pricing for plan \"" + planInfo.name + "\" is not configured yet.",
+          'Pricing for plan "' + planInfo.name + '" is not configured yet.',
           "error"
         );
         return;
@@ -703,4 +705,11 @@
   } else {
     initStore();
   }
+
+  // Optional public API
+  window.SafeStore = {
+    openPlanModal: openPlanPurchaseModal,
+    openCoinPackageModal: openCoinPackageModal,
+    usdToStars: usdToStars
+  };
 })();
