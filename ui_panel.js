@@ -25,8 +25,12 @@
   }
 
   // ----------------- Plan config -----------------
-  // Compact, user-facing description for each plan.
-  // Free is included for comparison & future use.
+  // Updated with new limits, coin usage and reporting:
+  //   - Free:   up to 99 MB, ~1 coin per 50 MB
+  //   - Bronze: up to 500 MB, ~1 coin per 30 MB
+  //   - Silver: up to 1200 MB, ~1 coin per 30 MB
+  //   - Gold:   up to 1800 MB, ~1 coin per 30 MB
+  // Silver & Gold reports are exported as Excel (.xlsx).
 
   var PLAN_CONFIG = {
     free: {
@@ -34,108 +38,108 @@
       name: "Free plan",
       badge: "Default",
       tagline: "Start using SAFE with basic limits.",
-      bestFor: "Trying SAFE with small files and core features.",
-      sizeLimit: "Up to 5 MB per file",
+      bestFor: "Trying SAFE with your own files before upgrading.",
+      sizeLimit: "Up to 99 MB per file",
       formats:
-        "Common formats such as PNG, JPG, TXT, ZIP and DOCX (basic use cases).",
+        "Core document, image and archive formats for everyday usage (no executables, no .SAFE encryption).",
       reports:
-        "Account reports are not available on the Free plan (you can upgrade for reporting).",
+        "Account reports are not available on the Free plan. Upgrade to a paid plan if you need Excel exports.",
       adsRemoved: false,
       speedLabel: "Standard speed",
       speed:
-        "Files are processed in the normal queue. Good enough for casual, non-urgent use.",
-      priority: "Standard queue priority.",
+        "Files are processed in the standard queue. Good enough for small, non-urgent usage.",
+      priority: "Standard processing priority in SAFE pipelines.",
       multiKey: false,
       folderEncryption: false,
       backupEncryptedFile: false,
       userIdLock: false,
       coinsUsage:
-        "Encrypting a file costs SAFE coins depending on its size. Decryption is always free.",
+        "Approximately 1 SAFE coin per 50 MB of encrypted data (rounded up per job). Decryption is always free.",
       accessNote:
-        "Files created on the Free plan cannot be locked to a specific Telegram account. Any user who has the correct password can decrypt the file."
+        "Files created on the Free plan cannot be locked to a specific Telegram / SAFE account. Any account that knows the correct password can decrypt them."
     },
     bronze: {
       id: "bronze",
       name: "Bronze plan",
       badge: "Entry level",
-      tagline: "Basic paid tier with fair limits.",
-      bestFor: "Casual users who need more formats and larger files.",
-      sizeLimit: "Up to 40 MB per file",
+      tagline: "Basic paid tier with higher limits and more formats.",
+      bestFor: "Casual users who need bigger files and more relaxed filtering.",
+      sizeLimit: "Up to 500 MB per file",
       formats:
-        "Everything from Free plus GIF, PDF, RAR, 7Z, MP3, MP4, XLSX and other common formats.",
+        "Most non-executable document, image, archive and media formats used in everyday workflows (no executables, no .SAFE encryption).",
       reports:
-        "Account reports are not included in Bronze. Upgrade to Silver or Gold for exports.",
+        "Account reports are not included in Bronze. Upgrade to Silver or Gold for Excel exports.",
       adsRemoved: true,
       speedLabel: "Standard speed",
       speed:
-        "Same base speed as Free users, but with more relaxed limits and fewer restrictions.",
-      priority: "Standard queue priority.",
+        "Similar base speed to Free, but with fewer restrictions and a smoother experience.",
+      priority: "Standard priority in the queue, with more relaxed limits than Free.",
       multiKey: false,
       folderEncryption: false,
       backupEncryptedFile: false,
       userIdLock: true,
       coinsUsage:
-        "Coins are charged based on encrypted file size (for example, around 1 SAFE coin per 10 MB, up to the plan limit). Decryption is always free.",
+        "Approximately 1 SAFE coin per 30 MB of encrypted data (rounded up per encryption job). Decryption remains free.",
       accessNote:
         "When encrypting a file you can choose between:\n" +
-        "• Only this Telegram account can decrypt it (SAFE locks the file header to your Telegram user ID), or\n" +
-        "• Any Telegram account with the correct password can decrypt it (no user ID lock)."
+        "• Only this Telegram account can decrypt it (SAFE locks the file header to your numeric user ID), or\n" +
+        "• Any Telegram account that knows the password can decrypt it (no user ID lock)."
     },
     silver: {
       id: "silver",
       name: "Silver plan",
       badge: "Most popular",
-      tagline: "Better performance, reports and key flexibility.",
+      tagline: "Faster queues, more formats and Excel reports.",
       bestFor:
-        "Regular users who want faster processing, more formats and reporting.",
-      sizeLimit: "Up to 50 MB per file",
+        "Regular users who want higher limits, better performance and reporting in Excel.",
+      sizeLimit: "Up to 1200 MB per file",
       formats:
-        "All Bronze formats plus extra ones used in office, media and app workflows (e.g. CSV, JSON, XML, MOV, MKV, WEBP, PPTX and more).",
+        "Everything from Bronze plus more advanced media, office and archive formats — practically any non-executable format that fits within your limits.",
       reports:
-        "Account activity report export as XLSX with coins, operations and basic stats.",
+        "Account activity reports exported as Excel (.xlsx) files with operations, coin usage and basic statistics.",
       adsRemoved: true,
       speedLabel: "Faster speed",
       speed:
-        "Files are processed faster than Free and Bronze users in a higher-priority queue.",
-      priority: "Priority queue over Free and Bronze.",
+        "Files are processed in a higher-priority queue than Free and Bronze users.",
+      priority: "Priority queue over Free and Bronze plans.",
       multiKey: true,
       folderEncryption: false,
       backupEncryptedFile: false,
       userIdLock: true,
       coinsUsage:
-        "Coins are charged based on encrypted file size (for example, around 1 SAFE coin per 10 MB, up to 50 MB). Decryption is always free.",
+        "Approximately 1 SAFE coin per 30 MB of encrypted data (rounded up per encryption job). Decryption remains free.",
       accessNote:
         "For each encrypted file you can decide:\n" +
-        "• Lock decryption to your Telegram user ID only, or\n" +
-        "• Let any Telegram account that knows the password decrypt it."
+        "• Lock decryption to your Telegram / SAFE account ID only, or\n" +
+        "• Allow decryption from any Telegram account that has the correct password."
     },
     gold: {
       id: "gold",
       name: "Gold plan",
       badge: "Pro users",
-      tagline: "Maximum performance, formats and priority.",
+      tagline: "Maximum limits, formats and queue priority.",
       bestFor:
-        "Heavy users, creators and professionals dealing with a wide range of formats.",
-      sizeLimit: "Up to 50 MB per file",
+        "Heavy users, creators and professionals working with large RAWs, backups and complex projects.",
+      sizeLimit: "Up to 1800 MB per file",
       formats:
-        "All Silver formats plus extended formats such as RAW, DNG, CR2, NEF, ARW, PSD, AI, SVG, EPS, WAV, FLAC, SQL, DB, BAK, TAR, GZ, M4V and more.",
+        "Almost any non-executable data format, including RAW photos, design files, heavy media and backup archives (still no executables and no .SAFE encryption).",
       reports:
-        "Advanced account report export as CSV for deeper analysis or import into your own tools.",
+        "Advanced account reports exported as Excel (.xlsx) files for deeper analysis or importing into your own tools.",
       adsRemoved: true,
       speedLabel: "Highest speed",
       speed:
-        "Always served by the fastest available queue in SAFE. Ideal for frequent encryption jobs.",
-      priority: "Top priority queue in all encryption pipelines.",
+        "Always served by the fastest queue. Ideal for frequent and heavy encryption jobs.",
+      priority: "Top priority in all SAFE encryption and decryption pipelines.",
       multiKey: true,
       folderEncryption: true,
       backupEncryptedFile: true,
       userIdLock: true,
       coinsUsage:
-        "Coins are charged based on encrypted file size (for example, around 1 SAFE coin per 10 MB, up to 50 MB). Decryption is always free.",
+        "Approximately 1 SAFE coin per 30 MB of encrypted data (rounded up per encryption job). Decryption remains free.",
       accessNote:
         "Gold keeps the same flexible rule:\n" +
-        "• Lock file strictly to your Telegram user ID, or\n" +
-        "• Allow decryption from any Telegram account that has the correct password.\n" +
+        "• Strictly lock the file to your Telegram / SAFE account ID, or\n" +
+        "• Allow decryption from any Telegram account that knows the password.\n" +
         "Folder encryption and optional encrypted backups are also available in this plan."
     }
   };
@@ -354,7 +358,6 @@
     hint.style.color = "var(--text-muted)";
     hint.textContent =
       "This description is based on the SAFE roadmap and may be slightly adjusted in the final production release.";
-
     bodyEl.appendChild(headerRow);
     bodyEl.appendChild(summaryCard);
     bodyEl.appendChild(hint);
@@ -384,7 +387,7 @@
       compareNote.style.fontSize = "11px";
       compareNote.style.color = "var(--text-muted)";
       compareNote.textContent =
-        "Free plan cannot lock files to a specific Telegram user ID. Paid plans add this option per file.";
+        "Free plan cannot lock files to a specific Telegram / SAFE user ID. Paid plans add this option per file.";
       bodyEl.appendChild(compareNote);
     }
 
@@ -421,7 +424,7 @@
       );
     }
 
-    // Speed / priority
+    // Speed / priority / reports
     extraItems.push(config.speed);
     extraItems.push(config.priority);
     extraItems.push(config.reports);
