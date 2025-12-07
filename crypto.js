@@ -69,63 +69,72 @@ return{blob:outBlob,name:outName,meta:meta}
 })
 })
 }
-function notify(msg,type){
-if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast(msg,type||"info");else if(w.Telegram&&w.Telegram.WebApp&&w.Telegram.WebApp.showAlert)w.Telegram.WebApp.showAlert(msg);else if(w.alert)alert(msg)
+function toast(msg,type){
+if(w.SAFE_UI_CORE&&typeof w.SAFE_UI_CORE.showToast==="function"){w.SAFE_UI_CORE.showToast(msg,type||"info")}else if(w.alert){w.alert(msg)}
 }
-function hasFileSystemAccess(){return typeof w!=="undefined"&&"showSaveFilePicker"in w}
-function saveWithPicker(blob,name){
-var opts={suggestedName:name||"file"};
-try{
-var lower=(name||"").toLowerCase();
-if(lower.endsWith(".safe"))opts.types=[{description:"SAFE encrypted file",accept:{"application/octet-stream":[".SAFE",".safe"]}}]
-}catch(e){}
-return w.showSaveFilePicker(opts).then(function(handle){
-return handle.createWritable().then(function(wr){
-return wr.write(blob).then(function(){return wr.close()})
-})
-})
+function dispatchEvt(name,detail){
+if(!w.dispatchEvent||!w.CustomEvent)return;
+try{w.dispatchEvent(new CustomEvent(name,{detail:detail||{}}))}catch(e){}
 }
-function saveWithLink(blob,name){
-return new Promise(function(res){
+async function saveBlobInteractive(blob,name){
+name=name||"file";
+if(w.showSaveFilePicker){
+var handle=await w.showSaveFilePicker({suggestedName:name});
+var writable=await handle.createWritable();
+await writable.write(blob);
+await writable.close();
+return{method:"picker"}
+}else{
 var url=URL.createObjectURL(blob);
 var a=document.createElement("a");
 a.href=url;
-a.download=name||"file";
+a.download=name;
 a.target="_blank";
 document.body.appendChild(a);
 a.click();
-setTimeout(function(){
-try{document.body.removeChild(a)}catch(e){}
-URL.revokeObjectURL(url);
-res()
-},1500);
+setTimeout(function(){try{document.body.removeChild(a)}catch(e){}URL.revokeObjectURL(url)},4000);
+return{method:"download"}
+}
+}
+function handleEncryptEvent(ev){
+var d=ev&&ev.detail||{};
+var file=d.file,password=d.password;
+if(!file||!password){toast("Missing file or password for encryption","error");return}
+toast("Encryption started...","info");
+encryptFile(file,password,function(p,phase){
+dispatchEvt("safe:encryption-progress",{progress:p,phase:phase,fileName:file.name})
+}).then(function(res){
+dispatchEvt("safe:encryption-finished",{ok:true,name:res.name,meta:res.meta});
+return saveBlobInteractive(res.blob,res.name).then(function(info){
+toast("Encryption finished. File is ready: "+res.name,"success")
+})
+}).catch(function(err){
+var msg=(err&&err.message)||String(err);
+dispatchEvt("safe:encryption-finished",{ok:false,error:msg});
+toast("Encryption failed: "+msg,"error")
 })
 }
-function saveBlobSmart(blob,name,kind){
-var label=kind==="decrypt"?"decrypted":"encrypted";
-if(hasFileSystemAccess()){
-return saveWithPicker(blob,name).then(function(){
-notify("Your "+label+" file has been saved on this device.","success");
-return
-},function(err){
-notify("Save dialog was closed or failed. You can try again.","error");
-throw err
+function handleDecryptEvent(ev){
+var d=ev&&ev.detail||{};
+var file=d.file,password=d.password;
+if(!file||!password){toast("Missing file or password for decryption","error");return}
+toast("Decryption started...","info");
+decryptFile(file,password,function(p,phase){
+dispatchEvt("safe:decryption-progress",{progress:p,phase:phase,fileName:file.name})
+}).then(function(res){
+dispatchEvt("safe:decryption-finished",{ok:true,name:res.name,meta:res.meta});
+return saveBlobInteractive(res.blob,res.name).then(function(info){
+toast("Decryption finished. File is ready: "+res.name,"success")
+})
+}).catch(function(err){
+var msg=(err&&err.message)||String(err);
+dispatchEvt("safe:decryption-finished",{ok:false,error:msg});
+toast("Decryption failed: "+msg,"error")
 })
 }
-return saveWithLink(blob,name).then(function(){
-notify("Your "+label+" file is ready. A new tab was opened so you can download it in your browser.","success");
-return
-})
+if(w&&w.addEventListener){
+w.addEventListener("safe:start-encryption",handleEncryptEvent);
+w.addEventListener("safe:start-decryption",handleDecryptEvent)
 }
-function encryptAndSaveFile(file,password,onProgress){
-return encryptFile(file,password,onProgress).then(function(r){
-return saveBlobSmart(r.blob,r.name,"encrypt").then(function(){return r})
-})
-}
-function decryptAndSaveFile(file,password,onProgress){
-return decryptFile(file,password,onProgress).then(function(r){
-return saveBlobSmart(r.blob,r.name,"decrypt").then(function(){return r})
-})
-}
-w.SAFE_CRYPTO={encryptFile:encryptFile,decryptFile:decryptFile,encryptAndSaveFile:encryptAndSaveFile,decryptAndSaveFile:decryptAndSaveFile};
+w.SAFE_CRYPTO={encryptFile:encryptFile,decryptFile:decryptFile};
 })(window);
