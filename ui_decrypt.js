@@ -18,57 +18,71 @@ pWrap.appendChild(pInp);pWrap.appendChild(btnEye);pField.appendChild(pLab);pFiel
 var err=ce("div","safe-field__error");err.id="safe-dec-error";body.appendChild(err);
 var status=ce("div","safe-modal__status");status.id="safe-dec-status";status.textContent="Ready";body.appendChild(status);
 var btnCancel=ce("button","btn btn--ghost"),btnStart=ce("button","btn btn--primary");
-btnCancel.type="button";btnStart.type="button";btnCancel.textContent="Cancel";btnStart.textContent="Start";btnStart.disabled=true;ftr.appendChild(btnCancel);ftr.appendChild(btnStart);
-function setInputState(el,state){el.classList.remove("safe-field__input--error","safe-field__input--ok");if(state==="error")el.classList.add("safe-field__input--error");if(state==="ok")el.classList.add("safe-field__input--ok")}
-function maskKey(p){p=p||"";if(p.length<=4)return p;return p.slice(0,2)+"****"+p.slice(-2)}
-function updateStart(){
-var file=fInp.files&&fInp.files[0];var okFile=file&&/\.safe$/i.test(file.name);var pwdOk=!!pInp.value;
-btnStart.disabled=!(okFile&&pwdOk);
-if(file&&!okFile){setInputState(fInp,"error");err.textContent="Please select a valid .SAFE file."}else{setInputState(fInp,"");if(err.textContent==="Please select a valid .SAFE file.")err.textContent=""}
+btnCancel.type="button";btnStart.type="button";
+btnCancel.textContent="Cancel";btnStart.textContent="Start";
+btnStart.disabled=true;
+ftr.appendChild(btnCancel);ftr.appendChild(btnStart);
+function setError(msg){err.textContent=msg||""}
+function setStatus(msg){status.textContent=msg||""}
+function evalReady(){
+var fileOk=fInp.files&&fInp.files[0];
+var pwd=pInp.value||"";
+btnStart.disabled=!(fileOk&&pwd.length>0)
 }
-function showToast(msg,type){
-var ui=w.SAFE_UI_CORE;
-if(ui&&typeof ui.showToast==="function"){ui.showToast(msg,type||"info")}
-else if(w.Telegram&&w.Telegram.WebApp&&w.Telegram.WebApp.showAlert){w.Telegram.WebApp.showAlert(msg)}
-else if(w.alert){alert(msg)}
-}
-function startReal(){
-var file=fInp.files&&fInp.files[0],pwd=pInp.value||"";if(!file||!pwd)return;
-status.textContent="Checking your SAFE account...";
-err.textContent="";
+function close(){var r=q(".safe-modal-root");if(r&&r.parentNode)r.parentNode.removeChild(r)}
+fInp.onchange=function(){setError("");setStatus("Ready");evalReady()};
+pInp.oninput=function(){setError("");setStatus("Ready");evalReady()};
+btnEye.onclick=function(){if(pInp.type==="password"){pInp.type="text";btnEye.innerHTML='<i class="material-icons">visibility_off</i>'}else{pInp.type="password";btnEye.innerHTML='<i class="material-icons">visibility</i>'}};
+btnCancel.onclick=close;
+btnStart.onclick=function(){
+if(btnStart.disabled)return;
+var file=fInp.files&&fInp.files[0],pwd=pInp.value||"";
+if(!file||!pwd)return;
+setError("");
+setStatus("Checking your SAFE account...");
 var tg=w.Telegram&&w.Telegram.WebApp&&w.Telegram.WebApp.initDataUnsafe&&w.Telegram.WebApp.initDataUnsafe.user?w.Telegram.WebApp.initDataUnsafe.user:null;
 if(!tg||!tg.id){
 var msg1="Cannot detect Telegram WebApp user. Please open SAFE from the official bot.";
-status.textContent="Cannot detect account.";setInputState(fInp,"error");
-showToast(msg1,"error");return
+setStatus("Cannot detect account.");
+setError(msg1);
+if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast(msg1,"error");else if(w.alert)alert(msg1);
+return
 }
 var uid=tg.id;
-var payload={user_id:uid,file_name:file.name,file_size_bytes:file.size,mime_type:file.type||"",password_mask:maskKey(pwd)};
+var payload={user_id:uid,file_name:file.name,file_size_bytes:file.size,mime_type:file.type||""};
 fetch("https://safe-bot-worker.alirahimikiasari.workers.dev/api/decrypt/precheck",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).then(function(res){
 return res.json().catch(function(){return null})
 }).then(function(data){
 if(!data||!data.ok){
 var msg2=(data&&data.message)||"Check failed";
-status.textContent=msg2;err.textContent=msg2;showToast(msg2,"error");return
+setStatus(msg2);
+setError(msg2);
+if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast(msg2,"error");else if(w.alert)alert(msg2);
+return
 }
-status.textContent="Account OK. Starting decryption...";
+setStatus("Account OK. Starting decryption...");
 if(w.dispatchEvent&&w.CustomEvent){
 var ev=new CustomEvent("safe:start-decryption",{detail:{file:file,password:pwd,meta:data}});
 w.dispatchEvent(ev)
 }
 close()
-}).catch(function(){
+}).catch(function(e){
 var msg3="Cannot contact SAFE backend. Please try again.";
-status.textContent=msg3;err.textContent=msg3;showToast(msg3,"error")
+setStatus(msg3);
+setError(msg3);
+if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast(msg3,"error");else if(w.alert)alert(msg3);
 })
+};
+root.classList.add("safe-modal-root--visible")
 }
-function close(){var r=q(".safe-modal-root");if(r&&r.parentNode)r.parentNode.removeChild(r)}
-fInp.onchange=updateStart;pInp.oninput=updateStart;
-btnEye.onclick=function(){if(pInp.type==="password"){pInp.type="text";btnEye.innerHTML='<i class="material-icons">visibility_off</i>'}else{pInp.type="password";btnEye.innerHTML='<i class="material-icons">visibility</i>'}};
-btnCancel.onclick=close;
-btnStart.onclick=function(){if(!btnStart.disabled)startReal()};
-updateStart();root.classList.add("safe-modal-root--visible")}
-function bind(){var b=q("#btn-decrypt-new");if(!b)return;var clone=b.cloneNode(true);clone.id=b.id;b.parentNode.replaceChild(clone,b);clone.addEventListener("click",openDecrypt)}
+function bind(){
+var b=q("#btn-decrypt-new");
+if(!b)return;
+var clone=b.cloneNode(true);
+clone.id=b.id;
+b.parentNode.replaceChild(clone,b);
+clone.addEventListener("click",openDecrypt)
+}
 function onReady(){bind()}
 if(d.readyState==="complete"||d.readyState==="interactive")setTimeout(onReady,0);else w.addEventListener("load",onReady,{once:true})
 })(window,document);
