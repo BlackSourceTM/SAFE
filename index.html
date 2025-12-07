@@ -598,7 +598,6 @@
 <script src="ui_core.js"></script>
 <script src="ui_encrypt.js"></script>
 <script src="ui_decrypt.js"></script>
-<script>window.addEventListener("safe:start-encryption", ev=>{const {file,password}=ev.detail;SAFE_CRYPTO.encryptAndSaveFile(file,password,(progress,stage)=>console.log("Encrypt:",Math.round(progress*100)+"%",stage)).catch(err=>console.error("Encryption failed:",err));});</script>
 <script src="ui_support.js"></script>
 <script src="ui_panel.js"></script>
 <script src="ui_store.js"></script>
