@@ -71,15 +71,12 @@ function close(){
 var r=q(".safe-modal-root");
 if(r&&r.parentNode)r.parentNode.removeChild(r)
 }
-
 function setErr(t){
 err.textContent=t||"";
 }
-
 function updateState(){
 btnStart.disabled=!(fInp.files&&fInp.files[0]&&pInp.value)
 }
-
 fInp.onchange=updateState;
 pInp.oninput=updateState;
 btnCancel.onclick=close;
@@ -88,14 +85,13 @@ btnStart.onclick=function(){
 var file=fInp.files&&fInp.files[0];
 var pwd=pInp.value||"";
 if(!file||!pwd)return;
-
 setErr("");
 status.textContent="Checking your SAFE account...";
-
 var tg=w.Telegram&&w.Telegram.WebApp&&w.Telegram.WebApp.initDataUnsafe?w.Telegram.WebApp.initDataUnsafe.user:null;
 if(!tg||!tg.id){
 setErr("Cannot detect Telegram account.");
 status.textContent="Account error.";
+if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast("Cannot detect Telegram WebApp user.","error");
 return
 }
 var uid=tg.id;
@@ -104,23 +100,20 @@ user_id:uid,
 file_name:file.name,
 file_size_bytes:file.size
 };
-
 fetch("https://safe-bot-worker.alirahimikiasari.workers.dev/api/decrypt/precheck",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify(payload)
-}).then(r=>r.json().catch(()=>null)).then(function(data){
+}).then(function(r){return r.json().catch(function(){return null})}).then(function(data){
 if(!data||!data.ok){
 var m=(data&&data.message)||"Check failed.";
 setErr(m);
 status.textContent=m;
+if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast(m,"error");
 return
 }
-
 status.textContent="Decrypting...";
-
 var user_hash=data.user.id_hash;
-
 function report(statusVal,errMsg){
 return fetch("https://safe-bot-worker.alirahimikiasari.workers.dev/api/decrypt/report",{
 method:"POST",
@@ -134,12 +127,12 @@ error_message:errMsg||null
 })
 })
 }
-
 w.SAFE_CRYPTO.decryptFile(
 file,
 pwd,
 function(p,label){
-status.textContent="Decrypting: "+Math.round(p*100)+"%"
+var pr=Math.round(p*100);
+status.textContent="Decrypting: "+pr+"%"
 },
 report,
 user_hash
@@ -147,21 +140,25 @@ user_hash
 status.textContent="Saving...";
 return w.SAFE_CRYPTO.safeSave(out.blob,out.name).then(function(){
 status.textContent="Done.";
-w.SAFE_CRYPTO.notify("Decryption complete.","success");
+if(w.SAFE_CRYPTO.notify)w.SAFE_CRYPTO.notify("Decryption complete.","success");
 close()
 })
 }).catch(function(e){
 var t=String(e&&e.message||e);
 setErr(t);
 status.textContent=t;
-w.SAFE_CRYPTO.notify(t,"error")
+if(w.SAFE_CRYPTO&&w.SAFE_CRYPTO.notify)w.SAFE_CRYPTO.notify(t,"error")
 })
+}).catch(function(){
+var m="Cannot contact SAFE backend. Please try again.";
+setErr(m);
+status.textContent=m;
+if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast(m,"error")
 })
 };
 
 root.classList.add("safe-modal-root--visible")
 }
-
 function bind(){
 var b=q("#btn-decrypt-open");
 if(!b)return;
@@ -170,7 +167,6 @@ c.id=b.id;
 b.parentNode.replaceChild(c,b);
 c.addEventListener("click",openDecrypt)
 }
-
 function onReady(){bind()}
 if(d.readyState==="complete"||d.readyState==="interactive")setTimeout(onReady,0);
 else w.addEventListener("load",onReady,{once:true});
