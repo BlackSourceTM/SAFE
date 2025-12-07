@@ -3,7 +3,7 @@ function q(s,c){return(c||d).querySelector(s)}
 function ce(t,c){var e=d.createElement(t);if(c)e.className=c;return e}
 function strength(p){var s=p||"",r={len:s.length>=8,digit:/\d/.test(s),case:/[a-z]/.test(s)&&/[A-Z]/.test(s),special:/[^A-Za-z0-9]/.test(s),latin:/^[\x20-\x7E]*$/.test(s)},score=0;if(r.len)score++;if(r.digit)score++;if(r.case)score++;if(r.special)score++;if(s.length>=12)score++;var lvl=0;if(score>=1)lvl=1;if(score>=2)lvl=2;if(score>=3)lvl=3;if(score>=4)lvl=4;if(score>=5)lvl=5;return{rules:r,level:lvl}}
 function updateRules(list,res){var items=list.querySelectorAll("li"),i;for(i=0;i<items.length;i++){var el=items[i],k=el.getAttribute("data-rule"),base=el.getAttribute("data-label")||el.textContent.replace(/^✔\s*/,"");if(!el.getAttribute("data-label"))el.setAttribute("data-label",base);if(res.rules[k]){el.textContent="✔ "+base;el.classList.add("ok")}else{el.textContent=base;el.classList.remove("ok")}}}
-function updateMeter(bar,lvl){var w=[0,20,40,60,80,100],c=["transparent","#ef4444","#f97316","#eab308","#22c55e","#06b6d4"];bar.style.width=w[lvl]+"%";bar.style.background=c[lvl]||c[0]}
+function updateMeter(bar,lvl){var wv=[0,20,40,60,80,100],c=["transparent","#ef4444","#f97316","#eab308","#22c55e","#06b6d4"];bar.style.width=wv[lvl]+"%";bar.style.background=c[lvl]||c[0]}
 function openEncrypt(){
 var root=q(".safe-modal-root");if(root&&root.parentNode)root.parentNode.removeChild(root);
 root=ce("div","safe-modal-root");
@@ -70,12 +70,34 @@ status.textContent=msg2;
 if(w.SAFE_UI_CORE&&w.SAFE_UI_CORE.showToast)w.SAFE_UI_CORE.showToast(msg2,"error");
 return
 }
+var plan=data.plan||"free";
+if(plan==="free"){
 status.textContent="Account OK. Starting encryption...";
 if(w.dispatchEvent&&w.CustomEvent){
-var ev=new CustomEvent("safe:start-encryption",{detail:{file:file,password:pwd,meta:data}});
+var evFree=new CustomEvent("safe:start-encryption",{detail:{file:file,password:pwd,meta:data,scope:"any"}});
+w.dispatchEvent(evFree)
+}
+close();
+return
+}
+status.textContent="Account OK. Choose access lock.";
+var bg=ce("div","safe-popup-backdrop"),pop=ce("div","safe-popup"),t=ce("div","safe-popup__title"),txt=ce("div","safe-popup__text"),acts=ce("div","safe-popup__actions"),bAny=ce("button","btn btn--ghost btn--sm"),bOwner=ce("button","btn btn--primary btn--sm");
+t.textContent="Access lock";
+var tg2=w.Telegram&&w.Telegram.WebApp&&w.Telegram.WebApp.initDataUnsafe&&w.Telegram.WebApp.initDataUnsafe.user?w.Telegram.WebApp.initDataUnsafe.user:null;
+var uidText=tg2&&tg2.id?String(tg2.id):"this Telegram account";
+txt.textContent="Choose how this SAFE file can be decrypted. You can lock it to your Telegram account ("+uidText+") or keep it open to any account with the correct password.";
+bAny.type="button";bOwner.type="button";bAny.textContent="🌐 Any account";bOwner.textContent="🔒 Only this account";
+acts.appendChild(bAny);acts.appendChild(bOwner);pop.appendChild(t);pop.appendChild(txt);pop.appendChild(acts);bg.appendChild(pop);d.body.appendChild(bg);
+function finish(scope){
+if(bg.parentNode)bg.parentNode.removeChild(bg);
+if(w.dispatchEvent&&w.CustomEvent){
+var ev=new CustomEvent("safe:start-encryption",{detail:{file:file,password:pwd,meta:data,scope:scope}});
 w.dispatchEvent(ev)
 }
 close()
+}
+bAny.onclick=function(){finish("any")};
+bOwner.onclick=function(){finish("owner")};
 }).catch(function(){
 var msg3="Cannot contact SAFE backend. Please try again.";
 status.textContent=msg3;
