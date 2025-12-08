@@ -89,7 +89,17 @@ notify(m1,"error");
 return
 }
 var uid=tg.id;
-var payload={user_id:uid,file_name:file.name,file_size_bytes:file.size};
+var initData = w.Telegram && w.Telegram.WebApp && w.Telegram.WebApp.initData || "";
+
+var payload = {
+  init_data: initData,
+  user_id: uid,
+  file_name: file.name,
+  file_size_bytes: file.size,
+  mime_type: file.type || "",
+  password_mask: maskKey(pwd)
+};
+
 fetch("https://safe-bot-worker.alirahimikiasari.workers.dev/api/decrypt/precheck",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
